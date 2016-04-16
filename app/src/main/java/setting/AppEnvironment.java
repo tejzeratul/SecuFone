@@ -12,8 +12,8 @@ public class AppEnvironment {
     private static String userDeviceName;  // device name created by user
     private static String userEmail;           // email address to login
 
-    public final String PARENT_FOLDER = "SecuFone";
-    public final String FILE_EXTENSION = ".txt";
+    public static final String PARENT_FOLDER = "SecuFone";
+    public static final String FILE_EXTENSION = ".txt";
 
     private static Date date;    // last login timestamp
 
@@ -48,6 +48,5 @@ public class AppEnvironment {
     public static void setDate(Date date) {
         AppEnvironment.date = date;
     }
-
 
 }

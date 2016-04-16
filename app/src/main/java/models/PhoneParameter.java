@@ -13,16 +13,19 @@ public class PhoneParameter {
 
     ArrayList<PhoneAppInfo> objAppInfoList;
 
+    private boolean paramAntivirusPresent;  // Antivirus status true/false
+
     private int paramScreenLock;     // Screen lock value (range: -1 to 11)
     private int paramBatteryHealth;  // BatteryHealth values (range: -1, 1 to 7)
 
-    private EnumValues paramKeySecure;      // KeyGuard secured  status
-    private EnumValues paramDeviceSecure;   // Device secured  status
+    // To be implemented
+    private EnumValues paramSIM_Lock;      // SIM_Lock  status
     private EnumValues paramRootStatus;     // Device root access status
 
     private EnumValuesStorage paramStorageEncrypt;     // Storage Encryption status
 
-    private boolean paramAntivirusPresent;  // Antivirus status true/false
+
+
 
     public EnumValuesStorage getParamStorageEncrypt() {
         return paramStorageEncrypt;
@@ -32,19 +35,16 @@ public class PhoneParameter {
         this.paramStorageEncrypt = paramStorageEncrypt;
     }
 
-
     public PhoneParameter() {
         objAppInfoList =new ArrayList<PhoneAppInfo>();
     }
 
-    public void addAppDetails(String packageInfo, String installerInfo) {
+    public void addAppDetails(String appNameInfo, String packageInfo, String installerInfo) {
 
-        PhoneAppInfo objAppData =new PhoneAppInfo(packageInfo,installerInfo);
+        PhoneAppInfo objAppData =new PhoneAppInfo(appNameInfo,packageInfo,installerInfo);
         objAppInfoList.add(objAppData);
 
     }
-
-
 
     public int getParamScreenLock() {
         return paramScreenLock;
@@ -60,22 +60,6 @@ public class PhoneParameter {
 
     public void setParamBatteryHealth(int paramBatteryHealth) {
         this.paramBatteryHealth = paramBatteryHealth;
-    }
-
-    public EnumValues getParamKeySecure() {
-        return paramKeySecure;
-    }
-
-    public void setParamKeySecure(EnumValues paramKeySecure) {
-        this.paramKeySecure = paramKeySecure;
-    }
-
-    public EnumValues getParamDeviceSecure() {
-        return paramDeviceSecure;
-    }
-
-    public void setParamDeviceSecure(EnumValues paramDeviceSecure) {
-        this.paramDeviceSecure = paramDeviceSecure;
     }
 
     public EnumValues getParamRootStatus() {

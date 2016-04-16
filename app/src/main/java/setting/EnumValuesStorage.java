@@ -6,5 +6,5 @@ package setting;
 
 public enum EnumValuesStorage {
 
-    ACTIVE, ACTIVATING, INACTIVE, UNSUPPORTED
+    ACTIVE, ACTIVATING, INACTIVE, UNSUPPORTED, UNKNOWN
 }

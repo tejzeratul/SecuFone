@@ -1,10 +1,10 @@
 package com.tejtron.secufone;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
 import android.os.Build;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,7 +14,7 @@ import models.DeviceInfo;
 
 import setting.AppEnvironment;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private static Context mContext;
     Button btnDoTest;

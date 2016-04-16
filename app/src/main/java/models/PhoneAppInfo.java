@@ -6,15 +6,26 @@ package models;
 
 class PhoneAppInfo {
 
+    private String paramAppNameInfo;    // Application Name
     private String paramPackageInfo;    // Application package name
     private String paramInstallerInfo;  // Application installer info
 
-    PhoneAppInfo(String paramPackageInfo, String paramInstallerInfo) {
+    PhoneAppInfo(String paramAppNameInfo, String paramPackageInfo, String paramInstallerInfo) {
 
+        this.paramAppNameInfo=paramAppNameInfo;
         this.paramPackageInfo=paramPackageInfo;
         this.paramInstallerInfo=paramInstallerInfo;
 
     }
+
+    public String getParamAppNameInfo() {
+        return paramAppNameInfo;
+    }
+
+    public void setParamAppNameInfo(String paramAppNameInfo) {
+        this.paramAppNameInfo = paramAppNameInfo;
+    }
+
 
     public String getParamPackageInfo() {
         return paramPackageInfo;

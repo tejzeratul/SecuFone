@@ -1,9 +1,7 @@
 package com.tejtron.secufone;
 
 import android.app.Activity;
-import android.app.KeyguardManager;
 import android.app.ProgressDialog;
-import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,25 +10,24 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import evaluations.Root;
 import evaluations.ScreenLock;
-
+import evaluations.StorageEncrypt;
+import file.FileProcessing;
+import models.DeviceInfo;
 import models.PhoneParameter;
-
+import models.TestInfo;
 import setting.AppEnvironment;
 import setting.EnumValues;
-import setting.EnumValuesStorage;
 
 public class PerformTestActivity extends Activity {
 
@@ -39,6 +36,9 @@ public class PerformTestActivity extends Activity {
     Button btnToBeRemoved;
     Button btnCheckScore;
     Button btnCheckAdvisory;
+
+    PhoneParameter objParamData=null;
+    TestInfo objTestInfo=null;
 
 
     @Override
@@ -74,6 +74,9 @@ public class PerformTestActivity extends Activity {
             }
         });
 
+        btnCheckAdvisory.setEnabled(false);
+        btnCheckScore.setEnabled(false);
+
         // To calculate parameters in background using AsyncTask
         new AsyncTaskCalculateParam().execute("5");
 
@@ -84,31 +87,16 @@ public class PerformTestActivity extends Activity {
      */
     protected void computeAndSendParameter() {
 
-        // to hold parameter data
-        PhoneParameter objParamData =new PhoneParameter();
+       // to hold PhoneParameter data
+        objParamData =new PhoneParameter();
 
         // Set parameter ScreenLock
         int lockType = ScreenLock.getCurrent(getContentResolver());
         objParamData.setParamScreenLock(lockType);
 
         // Set parameter StorageEncryption
-        DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
-        int enStatus = dpm.getStorageEncryptionStatus();
-
-        if (enStatus == android.app.admin.DevicePolicyManager.ENCRYPTION_STATUS_UNSUPPORTED)
-            objParamData.setParamStorageEncrypt(EnumValuesStorage.UNSUPPORTED);
-        else {
-            if (enStatus == android.app.admin.DevicePolicyManager.ENCRYPTION_STATUS_INACTIVE)
-                objParamData.setParamStorageEncrypt(EnumValuesStorage.INACTIVE);
-            else {
-                if (enStatus == android.app.admin.DevicePolicyManager.ENCRYPTION_STATUS_ACTIVATING)
-                    objParamData.setParamStorageEncrypt(EnumValuesStorage.ACTIVATING);
-                else {
-                    if (enStatus == android.app.admin.DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE)
-                        objParamData.setParamStorageEncrypt(EnumValuesStorage.ACTIVE);
-                }
-            }
-        }
+        StorageEncrypt objStorageEncrypt=new StorageEncrypt();
+        objParamData.setParamStorageEncrypt(objStorageEncrypt.getParamStorage());
 
         // Set parameter RootStatus
         Root objRoot=new Root();
@@ -116,49 +104,48 @@ public class PerformTestActivity extends Activity {
         System.out.println("Root St: "+rootParamResult);
         objParamData.setParamRootStatus(rootParamResult);
 
-
-        /*
-         * Add Below
-         */
-
-
-
-        // Keyguard Secure (SIm Status)
-        KeyguardManager km = (KeyguardManager) getApplicationContext()
-                .getSystemService(Context.KEYGUARD_SERVICE);
-        //    tvSIM.setText("SIM Secure Unknown");
-
-        //   (km.isDeviceSecure()) {
-        //         if (km.isKeyguardSecure())
-
-
-        /* old */
-
-
-
-        // Metric 10 - Battery Health
-        int batteryHealth=-1;
+        // Set parameter BatteryHealth
         BroadcastReceiver battery_receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent batteryIntent) {
 
-               int batteryHealth = batteryIntent.getIntExtra(BatteryManager.EXTRA_HEALTH, 0);
+                int batteryHealth = batteryIntent.getIntExtra(BatteryManager.EXTRA_HEALTH, 0);
+                objParamData.setParamBatteryHealth(batteryHealth);
             }
         };
 
+        // Set parameter Application Installed (AppInfo Object)
+        getAppsInstalled();
 
+        // Add all parameters to TestInfo object
+        objTestInfo=new TestInfo(objParamData,DeviceInfo.getInstance(),new Date(),AppEnvironment.getEmail(),AppEnvironment.getUserDeviceName());
 
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String jsonString_TestParam = mapper.writeValueAsString(objTestInfo);
+            System.out.println("JSON String: "+jsonString_TestParam);
+        } catch(Exception e) {
+            e.printStackTrace();
+            System.out.println("Error");
+        }
+
+       // Perform HTTP Post
 
     }
 
+    /*
+     * To get list of installed applications and also check for Antivirus application presence
+     */
     private int getAppsInstalled() {
+
         final PackageManager pm = getPackageManager();
 
         //get a list of installed apps.
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
 
         // Create File
-        File filePath=createFile("data");
+        FileProcessing objectFP=new FileProcessing();
+        File filePath=objectFP.createFile("data",true);
 
         int c=0;
         for (ApplicationInfo appInfo : packages) {
@@ -174,13 +161,23 @@ public class PerformTestActivity extends Activity {
                 } else {
                     // user installed apps
 
+                    String appName=appInfo.loadLabel(getPackageManager()).toString();
+                    String appPackage=appInfo.packageName;
+                    String appSource= pm.getInstallerPackageName(appInfo.packageName);
+
                     c++;
-                    writeToFile(filePath, c + ".");
-                    writeToFile(filePath, "Installed package :" + appInfo.packageName);
-                    writeToFile(filePath, "Source Dir :" + appInfo.sourceDir);
-                    writeToFile(filePath, "Launch Activity :" + pm.getLaunchIntentForPackage(appInfo.packageName));
-                    writeToFile(filePath, "Origin :" + pm.getInstallerPackageName(appInfo.packageName));
-                    writeToFile(filePath, "");
+                    objParamData.addAppDetails(appName,appPackage,appSource);
+
+                    /*
+                        objectFP.writeToFile(filePath, c + ".");
+                        objectFP.writeToFile(filePath, " Application Name : "+ appInfo.loadLabel(getPackageManager()).toString());
+                        objectFP.writeToFile(filePath, "Installed package :" + appInfo.packageName);
+                        objectFP.writeToFile(filePath, "Source Dir :" + appInfo.sourceDir);
+                        objectFP.writeToFile(filePath, "Launch Activity :" + pm.getLaunchIntentForPackage(appInfo.packageName));
+                        objectFP.writeToFile(filePath, "Origin :" + pm.getInstallerPackageName(appInfo.packageName));
+                        objectFP.writeToFile(filePath, "");
+
+                     */
 
                 }
 
@@ -193,51 +190,9 @@ public class PerformTestActivity extends Activity {
         return 0;
     }
 
-    private File createFile(String rawFileName) {
 
-        /*
-        Separate File Creation & File Write Logic
-         */
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
-        File filePath=null;
-        Date now = new Date();
-        String uniqueName = formatter.format(now);
 
-        String fileName = rawFileName + uniqueName + AppEnvironment.FILE_EXTENSION;
-
-        try {
-            //File root = new File(Environment.getExternalStorageDirectory()+File.separator+"Music_Folder", "Report Files");
-            File root = new File(Environment.getExternalStorageDirectory(), AppEnvironment.PARENT_FOLDER);
-            if (!root.exists()) {
-                root.mkdirs();
-            }
-            filePath = new File(root, fileName);
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        }
-
-        return filePath;
-    }
-
-    private void writeToFile(File filePath, String data) {
-
-        try {
-            // filename and append
-            FileWriter writer = new FileWriter(filePath,true);
-            writer.append(data+"\n\n");
-            writer.flush();
-            writer.close();
-//            Toast.makeText(this, "Data has been written to Report File", Toast.LENGTH_SHORT).show();
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-
-        }
-
-    }
 
     private class AsyncTaskCalculateParam extends AsyncTask<String, String, String> {
 
@@ -249,7 +204,7 @@ public class PerformTestActivity extends Activity {
             publishProgress("Calculating..."); // Calls onProgressUpdate()
             try {
 
-                getAppsInstalled();
+                computeAndSendParameter();
             } catch (Exception e) {
                 e.printStackTrace();
                 resp = e.getMessage();
@@ -262,6 +217,8 @@ public class PerformTestActivity extends Activity {
         protected void onPostExecute(String result) {
             // execution of result of Long time consuming operation
             progressDialog.dismiss();
+            btnCheckAdvisory.setEnabled(true);
+            btnCheckScore.setEnabled(true);
 
         }
 

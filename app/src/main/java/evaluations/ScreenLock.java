@@ -108,10 +108,11 @@ public class ScreenLock
 
                 KeyguardManager km = (KeyguardManager) MainActivity.getContext().getSystemService(Context.KEYGUARD_SERVICE);
 
-                if(km.isDeviceSecure())
+                if(km.isDeviceSecure()) {
+
 
                     return ScreenLock.PATTERN;
-                
+                }
                 else
                     return ScreenLock.NONE_OR_SLIDER;
             }
