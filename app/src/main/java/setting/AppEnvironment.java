@@ -7,13 +7,18 @@ import java.util.Date;
  */
 public class AppEnvironment {
 
+    public final static String PARENT_FOLDER = "SecuFone";
+    public final static String FILE_EXTENSION = ".txt";
+    public final static String DEF_ANDROID_ID ="0000";
+
+    public final static int DEF_HTTP_TIMEOUT =25000;
+
     private static int apiLevel;   // API level of device
 
-    private static String userDeviceName;  // device name created by user
-    private static String userEmail;           // email address to login
+    private static String userDeviceName="test1";  // device name visible to user
+    private static String userEmail="test1@gmail.com";  // email address to login
 
-    public static final String PARENT_FOLDER = "SecuFone";
-    public static final String FILE_EXTENSION = ".txt";
+    private static String androidId= DEF_ANDROID_ID; // Android ID from device
 
     private static Date date;    // last login timestamp
 
@@ -39,6 +44,14 @@ public class AppEnvironment {
 
     public static void setEmail(String email) {
         AppEnvironment.userEmail = email;
+    }
+
+    public static String getAndroidId() {
+        return androidId;
+    }
+
+    public static void setAndroidId(String androidId) {
+        AppEnvironment.androidId = androidId;
     }
 
     public static Date getDate() {

@@ -9,13 +9,35 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".PerformTestActivity">
 
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/button"
-        android:layout_alignParentTop="true"
+    <View
+        android:id="@+id/viewInvisible"
+        android:layout_width="10dp"
+        android:layout_height="0dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="65dp" />
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/btnCScore"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@id/viewInvisible"
+        android:layout_toStartOf="@id/viewInvisible"
+        android:text="Check Score"
+        android:theme="@style/TaskButton" />
+
+    <Button
+        android:id="@+id/btnCAdvisory"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_toEndOf="@+id/viewInvisible"
+        android:layout_toRightOf="@+id/viewInvisible"
+        android:text="Check Advisory"
+        android:theme="@style/TaskButton" />
+
 </RelativeLayout>

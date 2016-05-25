@@ -18,13 +18,10 @@ public class PhoneParameter {
     private int paramScreenLock;     // Screen lock value (range: -1 to 11)
     private int paramBatteryHealth;  // BatteryHealth values (range: -1, 1 to 7)
 
-    // To be implemented
-    private EnumValues paramSIM_Lock;      // SIM_Lock  status
+    private EnumValues paramSIMLock;      // SIM_Lock  status
     private EnumValues paramRootStatus;     // Device root access status
 
     private EnumValuesStorage paramStorageEncrypt;     // Storage Encryption status
-
-
 
 
     public EnumValuesStorage getParamStorageEncrypt() {
@@ -36,14 +33,18 @@ public class PhoneParameter {
     }
 
     public PhoneParameter() {
-        objAppInfoList =new ArrayList<PhoneAppInfo>();
+        objAppInfoList = new ArrayList<PhoneAppInfo>();
     }
 
     public void addAppDetails(String appNameInfo, String packageInfo, String installerInfo) {
 
-        PhoneAppInfo objAppData =new PhoneAppInfo(appNameInfo,packageInfo,installerInfo);
+        PhoneAppInfo objAppData = new PhoneAppInfo(appNameInfo, packageInfo, installerInfo);
         objAppInfoList.add(objAppData);
 
+    }
+
+    public ArrayList<PhoneAppInfo> getObjAppInfoList() {
+        return objAppInfoList;
     }
 
     public int getParamScreenLock() {
@@ -70,12 +71,20 @@ public class PhoneParameter {
         this.paramRootStatus = paramRootStatus;
     }
 
-    public boolean isParamAntivirusPresent() {
+    public boolean getParamAntivirusPresent() {
         return paramAntivirusPresent;
     }
 
     public void setParamAntivirusPresent(boolean paramAntivirusPresent) {
         this.paramAntivirusPresent = paramAntivirusPresent;
+    }
+
+    public EnumValues getParamSIMLock() {
+        return paramSIMLock;
+    }
+
+    public void setParamSIMLock(EnumValues paramSIMLock) {
+        this.paramSIMLock = paramSIMLock;
     }
 
 }

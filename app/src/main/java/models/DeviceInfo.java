@@ -1,11 +1,5 @@
 package models;
 
-import android.content.Context;
-import android.os.Build;
-import android.telephony.TelephonyManager;
-
-import com.tejtron.secufone.MainActivity;
-
 /**
  * Created by Tejas on 4/14/2016.
  */
@@ -14,21 +8,10 @@ public class DeviceInfo {
     private static String manufacturer_name;   // Manufacturer name (Manufacturer)
     private static String model_name;          // Model name (Model)
     private static String product_device;      // Device name (Device)
-    private static String simOperator_name;        // Service provider name
+    private static String simOperator_name;    // Service provider name
 
-    private static DeviceInfo objectDeviceInfo;
+    private static int apiLevel; // API Level
 
-    private Context dContext;
-
-    public DeviceInfo() {
-
-        setManufacturer_name(Build.MANUFACTURER);
-        setModel_name(Build.MODEL);
-        setProduct_device(Build.DEVICE);
-        dContext= MainActivity.getContext();
-        setSIM_OperatorName();
-
-    }
 
     public static String getManufacturer_name() {
         return manufacturer_name;
@@ -54,34 +37,23 @@ public class DeviceInfo {
         DeviceInfo.product_device = product_device;
     }
 
-    public String getSIM_OperatorName() {
+    public static String getSIM_OperatorName() {
         return simOperator_name;
 
     }
 
+    public static void setSIM_OperatorName(String simOperator_Name) {
 
-
-    public static synchronized DeviceInfo getInstance( ) {
-        if (objectDeviceInfo == null)
-            objectDeviceInfo=new DeviceInfo();
-        return objectDeviceInfo;
+        DeviceInfo.simOperator_name = simOperator_Name;
     }
 
-    public void setSIM_OperatorName() {
-
-        TelephonyManager  telephonyManager = (TelephonyManager) dContext.getSystemService(Context.TELEPHONY_SERVICE);
-        int simState = telephonyManager.getSimState();
-
-        String result="Unknown";
-
-        switch (simState) {
-
-            case (TelephonyManager.SIM_STATE_READY): {
-                result = telephonyManager.getSimOperatorName();
-            }
-        }
-
-        simOperator_name=result;
+    public static int getApiLevel() {
+        return apiLevel;
     }
+
+    public static void setApiLevel(int apiLevel) {
+        DeviceInfo.apiLevel = apiLevel;
+    }
+
 
 }

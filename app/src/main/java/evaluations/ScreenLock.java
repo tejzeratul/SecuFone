@@ -10,7 +10,7 @@ package evaluations;
         import android.os.Environment;
         import android.provider.Settings;
 
-        import com.tejtron.secufone.MainActivity;
+        import com.tejtron.secufone.secufone.MainActivity;
         import setting.AppEnvironment;
 
 public class ScreenLock
@@ -37,12 +37,12 @@ public class ScreenLock
     /**
      * Android using "PIN" unlock method.
      */
-    public final static int PIN_COMPLEX = 3;
+    public final static int PIN = 3;
 
     /**
      * Android using "COMPLEX PIN" unlock method.
      */
-    public final static int PIN = 4;
+    public final static int PIN_COMPLEX = 4;
 
 
     /**

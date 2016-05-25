@@ -7,13 +7,30 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.tejtron.secufone.MainActivity">
+    android:background="#FFFAFA"
+    tools:context="com.tejtron.secufone.secufone.MainActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Logged in as xyz@gmail.com"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="4dp"
+        android:layout_marginStart="4dp"
         android:id="@+id/tvUserName" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Check Advisoryy"
+        android:id="@+id/btnInvisible"
+        android:layout_below="@+id/tvUserName"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:theme="@style/TaskButton"
+        android:visibility="invisible"
+        />
 
     <Button
         android:layout_width="wrap_content"
@@ -22,7 +39,13 @@
         android:id="@+id/btnPerformTest"
         android:layout_above="@+id/btnScore"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="40dp" />
+        android:layout_alignLeft="@+id/btnInvisible"
+        android:layout_alignStart="@id/btnInvisible"
+        android:layout_alignRight="@id/btnInvisible"
+        android:layout_alignEnd="@id/btnInvisible"
+        android:layout_marginBottom="40dp"
+        android:theme="@style/TaskButton"
+        />
 
     <Button
         android:layout_width="wrap_content"
@@ -30,25 +53,36 @@
         android:text="Check Scores"
         android:id="@+id/btnScore"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignLeft="@+id/btnInvisible"
+        android:layout_alignStart="@id/btnInvisible"
+        android:layout_alignRight="@id/btnInvisible"
+        android:layout_alignEnd="@id/btnInvisible"
+        android:theme="@style/TaskButton"
+        />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Check Advisory"
         android:id="@+id/btnReco"
+        android:layout_alignLeft="@+id/btnInvisible"
+        android:layout_alignStart="@id/btnInvisible"
+        android:layout_alignRight="@id/btnInvisible"
+        android:layout_alignEnd="@id/btnInvisible"
         android:layout_below="@+id/btnScore"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp" />
+        android:layout_marginTop="40dp"
+        android:theme="@style/TaskButton"
+        />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Device Name: Tej G3"
         android:id="@+id/tvDeviceName"
+        android:layout_marginLeft="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
-
-
 </RelativeLayout>
