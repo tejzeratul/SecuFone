@@ -10,7 +10,7 @@ package evaluations;
         import android.os.Environment;
         import android.provider.Settings;
 
-        import com.tejtron.secufone.secufone.MainActivity;
+        import com.tejtron.secufone.MainActivity;
         import setting.AppEnvironment;
 
 public class ScreenLock
