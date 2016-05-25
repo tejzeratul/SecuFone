@@ -1,17 +1,16 @@
 package evaluations;
 
-        import java.io.File;
+import android.app.KeyguardManager;
+import android.app.admin.DevicePolicyManager;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.Settings;
 
-        import android.app.KeyguardManager;
-        import android.app.admin.DevicePolicyManager;
-        import android.content.ContentResolver;
-        import android.content.Context;
-        import android.os.Build;
-        import android.os.Environment;
-        import android.provider.Settings;
+import com.tejtron.secufone.MainActivity;
 
-        import com.tejtron.secufone.MainActivity;
-        import setting.AppEnvironment;
+import java.io.File;
 
 public class ScreenLock
 {

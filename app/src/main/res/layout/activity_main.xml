@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:background="#FFFAFA"
-    tools:context="com.tejtron.secufone.secufone.MainActivity">
+    tools:context="com.tejtron.secufone.MainActivity">
 
     <TextView
         android:layout_width="wrap_content"

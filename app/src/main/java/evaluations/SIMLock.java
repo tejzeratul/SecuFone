@@ -5,8 +5,6 @@ import android.telephony.TelephonyManager;
 
 import com.tejtron.secufone.MainActivity;
 
-import java.lang.reflect.Method;
-
 import setting.EnumValues;
 
 /**
