@@ -16,6 +16,19 @@
 #   public *;
 #}
 
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepattributes EnclosingMethod
+
+# POJOs used with GSON
+# The variable names are JSON key values and should not be obfuscated
+-keepclassmembers class models.AdvisoryInfo { *; }
+-keepclassmembers class models.DeviceInfo { *; }
+-keepclassmembers class models.FinalScoreInfo { *; }
+-keepclassmembers class models.PhoneAppInfo { *; }
+-keepclassmembers class models.PhoneParameter { *; }
+-keepclassmembers class models.TestInfo { *; }
+-keepclassmembers class models.ValidationBean { *; }
 
 ##---------------Begin: proguard configuration for Gson  ----------
 # Gson uses generic type information stored in a class file when working with fields. Proguard
@@ -34,12 +47,31 @@
 
 ##---------------End: proguard configuration for Gson  ----------
 
--keep class evaluations.**
--keep class models.**
--keep class com.tejtron.secufone.**
--keep class file.**
--keep class setting.**
--keep class session.**
--keep class net.**
+# enums
+-keepclassmembers,allowoptimization enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-keep class evaluations.***
+-keep class file.***
+-keep class setting.***
+-keep class session.***
+-keep class net.***
+
+# serialization
+-keepnames class * implements java.io.Serializable
+
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    !static !transient <fields>;
+    !private <fields>;
+    !private <methods>;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
 
 

@@ -41,6 +41,7 @@ public class PerformTestActivity extends Activity {
 
     private static Context pContext;
 
+    Button btnToBeRemoved;
     Button btnCheckScore;
     Button btnCheckAdvisory;
     String score_result;
@@ -49,7 +50,6 @@ public class PerformTestActivity extends Activity {
     DeviceInfo objDeviceInfo = null;
     TestInfo objTestInfo = null;
     FinalScoreInfo objFinalScore = null;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,8 +99,6 @@ public class PerformTestActivity extends Activity {
         Method to find all parameters value and send using POST
      */
     protected String computeAndSendParameter() {
-
-        setToastMessage("In computeAndSendParameter",Toast.LENGTH_SHORT);
 
         // to hold PhoneParameter data
         objParamData = new PhoneParameter();
@@ -177,7 +175,6 @@ public class PerformTestActivity extends Activity {
      */
     private void getAppsInstalled() {
 
-        setToastMessage("In getAppsInstalled",Toast.LENGTH_SHORT);
         final PackageManager pm = getPackageManager();
 
         //get a list of installed apps
@@ -192,7 +189,6 @@ public class PerformTestActivity extends Activity {
 
                 } else if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
                     // system apps
-                    //
 
                 } else {
                     // user installed apps
