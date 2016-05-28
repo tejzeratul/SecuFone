@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import net.HTTP_Utility;
+import net.Network_Access;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -260,45 +261,21 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             focusView.requestFocus();
         } else {
 
-            showProgress(true);
-            mAuthTask = new UserRegisterTask(email, password1, name, country, city, state);
-            mAuthTask.execute((Void) null);
+
+            // Check Network Access
+            Network_Access objNetworkAccess=new Network_Access();
+            boolean isNetConnected=objNetworkAccess.isNetworkConnected(getApplicationContext());
+
+            if(isNetConnected) {
+
+                showProgress(true);
+                mAuthTask = new UserRegisterTask(email, password1, name, country, city, state);
+                mAuthTask.execute((Void) null);
+            } else {
+                setToastMessage("Network unavailable",Toast.LENGTH_LONG);
+            }
         }
     }
-
-/*
-    private boolean isEmailValid(String email) {
-
-        Pattern pattern = Patterns.EMAIL_ADDRESS;
-        return pattern.matcher(email).matches();
-    }
-
-    private boolean isPasswordValid(String password1, String password2) {
-
-
-        if (password1.equals(password2)) {
-
-            final String PASSWORD_PATTERN =
-                    "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20})";
-
-            Pattern patternPassword
-                    = Pattern.compile(PASSWORD_PATTERN);
-            Matcher matcherPassword = patternPassword.matcher(password1);
-            return matcherPassword.matches();
-        } else
-            return false;
-    }
-
-    private boolean isNameValid(String name) {
-        return (name.length()>3);
-    }
-
-    private boolean isGeoValid(String country, String city, String state) {
-        //TODO: Replace this with your own logic
-
-        return true;
-    }
-    */
 
     /**
      * Shows the progress UI and hides the login form.

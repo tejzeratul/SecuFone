@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import net.HTTP_Utility;
+import net.Network_Access;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -203,22 +204,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+
+            // Check Network Access
+            Network_Access objNetworkAccess=new Network_Access();
+            boolean isNetConnected=objNetworkAccess.isNetworkConnected(getApplicationContext());
+
+            if(isNetConnected) {
+
+                showProgress(true);
+                mAuthTask = new UserLoginTask(email, password);
+                mAuthTask.execute((Void) null);
+            } else {
+                setToastMessage("Network unavailable",Toast.LENGTH_LONG);
+            }
         }
     }
-
-    /*
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
-    }*/
 
     /**
      * Shows the progress UI and hides the login form.

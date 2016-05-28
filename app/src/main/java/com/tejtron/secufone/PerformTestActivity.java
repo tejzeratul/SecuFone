@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import net.HTTP_Utility;
+import net.Network_Access;
 
 import java.util.Date;
 import java.util.List;
@@ -90,9 +91,18 @@ public class PerformTestActivity extends Activity {
         btnCheckAdvisory.setEnabled(false);
         btnCheckScore.setEnabled(false);
 
-        // To calculate parameters in background using AsyncTask
-        new AsyncTaskCalculateParam().execute("5");
 
+        // Check Network Access
+        Network_Access objNetworkAccess=new Network_Access();
+        boolean isNetConnected=objNetworkAccess.isNetworkConnected(getApplicationContext());
+
+        if(isNetConnected) {
+
+            // To calculate parameters in background using AsyncTask
+            new AsyncTaskCalculateParam().execute("5");
+        } else {
+            setToastMessage("Network unavailable",Toast.LENGTH_LONG);
+        }
     }
 
     /*

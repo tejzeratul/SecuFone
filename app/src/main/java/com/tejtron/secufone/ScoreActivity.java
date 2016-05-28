@@ -9,11 +9,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import net.HTTP_Utility;
+import net.Network_Access;
 
 import java.text.DecimalFormat;
 
@@ -82,9 +84,18 @@ public class ScoreActivity extends AppCompatActivity {
 
                 System.out.println("ScoreActivity Status is 0");
 
-                // To fetch Score in background using AsyncTask
-                new AsyncTaskFetchScore().execute(objFinalScore.getTestId());
 
+                // Check Network Access
+                Network_Access objNetworkAccess=new Network_Access();
+                boolean isNetConnected=objNetworkAccess.isNetworkConnected(getApplicationContext());
+
+                if(isNetConnected) {
+
+                    // To fetch Score in background using AsyncTask
+                    new AsyncTaskFetchScore().execute(objFinalScore.getTestId());
+                } else {
+                    setToastMessage("Network unavailable",Toast.LENGTH_LONG);
+                }
             }
 
         }
@@ -152,6 +163,10 @@ public class ScoreActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    public void setToastMessage(String message, int type) {
+        Toast.makeText(this, message, type).show();
     }
 
 }
