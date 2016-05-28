@@ -43,6 +43,8 @@ import session.UserSessionManager;
 import setting.AppEnvironment;
 import setting.EncryptString;
 import setting.TempConfigFIle;
+import validate.UserValidation;
+import validate.Validation;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -213,36 +215,40 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         String email = mEmailView.getText().toString().trim().toLowerCase();
         String password1 = mPassword1View.getText().toString().trim();
         String password2 = mPassword2View.getText().toString().trim();
-        String name= mNameView.getText().toString().trim().toLowerCase();
-        String country= mCountryView.getText().toString().trim().toLowerCase();
-        String city= mCityView.getText().toString().trim().toLowerCase();
-        String state= mStateView.getText().toString().trim().toLowerCase();
+        String name = mNameView.getText().toString().trim().toLowerCase();
+        String country = mCountryView.getText().toString().trim().toLowerCase();
+        String city = mCityView.getText().toString().trim().toLowerCase();
+        String state = mStateView.getText().toString().trim().toLowerCase();
 
         boolean cancel = false;
         View focusView = null;
 
+        // Validation
+        UserValidation userValidate = new UserValidation();
+
         // Check for a valid password, if the user entered one.
-        if (!isPasswordValid(password1, password2)) {
-            mPassword1View.setError(getString(R.string.error_invalid_password));
-            mPassword2View.setError(getString(R.string.error_invalid_password));
+        Validation validatePassword = userValidate.isPasswordValid(password1, password2);
+        if (!validatePassword.getStatus()) {
+            mPassword1View.setError(validatePassword.getErrorMessage());
             focusView = mPassword1View;
             cancel = true;
         }
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
+        Validation validateEmail = userValidate.isEmailValid(email);
+        if (!validateEmail.getStatus()) {
+            mEmailView.setError(validateEmail.getErrorMessage());
             focusView = mEmailView;
             cancel = true;
         }
 
         // Check for valid name
-        //TODO: validation for name
-
+        Validation validateName = userValidate.isNameValid(name);
+        if (!validateName.getStatus()) {
+            mNameView.setError(validateName.getErrorMessage());
+            focusView = mNameView;
+            cancel = true;
+        }
 
         // Check for valid country,city,state
         //TODO: validation for country, city, state
@@ -255,11 +261,12 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         } else {
 
             showProgress(true);
-            mAuthTask = new UserRegisterTask(email, password1,name,country,city,state);
+            mAuthTask = new UserRegisterTask(email, password1, name, country, city, state);
             mAuthTask.execute((Void) null);
         }
     }
 
+/*
     private boolean isEmailValid(String email) {
 
         Pattern pattern = Patterns.EMAIL_ADDRESS;
@@ -291,6 +298,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
         return true;
     }
+    */
 
     /**
      * Shows the progress UI and hides the login form.
@@ -399,11 +407,11 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         UserRegisterTask(String email, String password, String name, String country, String state, String city) {
             mEmail = email;
             mPassword = password;
-            mCountry=country;
-            mName=name;
-            mCity=city;
-            mState=state;
-            mDateCreated=new Date().toString();
+            mCountry = country;
+            mName = name;
+            mCity = city;
+            mState = state;
+            mDateCreated = new Date().toString();
         }
 
         @Override

@@ -39,6 +39,8 @@ import session.UserSessionManager;
 import setting.AppEnvironment;
 import setting.EncryptString;
 import setting.TempConfigFIle;
+import validate.UserValidation;
+import validate.Validation;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -175,20 +177,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         boolean cancel = false;
         View focusView = null;
 
+        // Validation
+        UserValidation userValidate=new UserValidation();
+
         // Check for a valid password, if the user entered one.
-        if (!isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
+        Validation validatePassword=userValidate.isPasswordValid(password);
+        if (!validatePassword.getStatus()) {
+            mPasswordView.setError(validatePassword.getErrorMessage());
             focusView = mPasswordView;
             cancel = true;
         }
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
+        Validation validateEmail=userValidate.isEmailValid(email);
+        if (!validateEmail.getStatus()) {
+            mEmailView.setError(validateEmail.getErrorMessage());
             focusView = mEmailView;
             cancel = true;
         }
@@ -206,6 +209,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    /*
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
         return email.contains("@");
@@ -214,7 +218,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
         return password.length() > 4;
-    }
+    }*/
 
     /**
      * Shows the progress UI and hides the login form.

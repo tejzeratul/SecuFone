@@ -1,14 +1,14 @@
-package models;
+package validate;
 
 /**
  * Created by Tejas on 5/18/2016.
  */
-public class ValidationBean {
+public class Validation {
 
     private boolean status=false;
-    private String errorMessage="";
+    private String errorMessage="Error";
 
-    public boolean isStatus() {
+    public boolean getStatus() {
         return status;
     }
 

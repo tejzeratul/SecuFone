@@ -22,6 +22,7 @@
 
     <ScrollView
         android:id="@+id/register_form"
+        android:padding="2dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
