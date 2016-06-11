@@ -9,6 +9,16 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.tejtron.secufone.ScoreActivity">
 
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scroll"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/scores_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -84,6 +94,9 @@
         android:background="@drawable/score_shape"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp" />
+
+        </RelativeLayout>
+    </ScrollView>
 
     <Button
         android:layout_width="match_parent"

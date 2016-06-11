@@ -29,7 +29,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.HTTP_Utility;
+import net.HTTPS_Utility;
 import net.Network_Access;
 
 import java.util.ArrayList;
@@ -335,7 +335,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             paramPost.put("password", tempPassword);
 
             // Perform HTTP Post
-            HTTP_Utility objHTTP = new HTTP_Utility();
+            HTTPS_Utility objHTTP = new HTTPS_Utility();
+            objHTTP.initSSL_ForHTTPS(getApplicationContext());
             String response = objHTTP.performPostCall(TempConfigFIle.hostNameForLogin, "POST", AppEnvironment.DEF_HTTP_TIMEOUT, paramPost);
             System.out.println("Response: " + response);
 

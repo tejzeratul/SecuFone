@@ -36,15 +36,15 @@ public class AdvisoryActivity extends AppCompatActivity {
                 Intent intent = new Intent(AdvisoryActivity.this,
                         ScoreActivity.class);
                 Bundle yourBundle = getIntent().getExtras();
-                String jsonScoreResult = yourBundle.getString("score_result");
-                intent.putExtra("score_result", jsonScoreResult);
+                String jsonScoreResult = yourBundle.getString("test_result");
+                intent.putExtra("test_result", jsonScoreResult);
                 startActivity(intent);
 
             }
         });
 
         Bundle yourBundle = getIntent().getExtras();
-        String jsonScoreResult = yourBundle.getString("score_result");
+        String jsonScoreResult = yourBundle.getString("test_result");
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);

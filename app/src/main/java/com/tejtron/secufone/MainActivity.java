@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import models.DeviceInfo;
+import session.TestResultSessionManager;
 import session.UserSessionManager;
 import setting.AppEnvironment;
 
@@ -26,9 +27,11 @@ public class MainActivity extends AppCompatActivity {
 
     TextView tvUserName;
     TextView tvDeviceName;
+    String userEmail;
 
     // User Session Manager Class
-    UserSessionManager session;
+    UserSessionManager userSession;
+    TestResultSessionManager testResultSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +41,13 @@ public class MainActivity extends AppCompatActivity {
         mContext = getApplicationContext();
 
         // Session class instance
-        session = new UserSessionManager(getApplicationContext());
-
-        //uncomment line below
-        //session.createUserLoginSession("tejas","tej@gmail.com");
+        userSession = new UserSessionManager(getApplicationContext());
+        testResultSession =new TestResultSessionManager(getApplicationContext());
 
         // Check user login (this is the important point)
         // If User is not logged in , This will redirect user to LoginActivity
         // and finish current activity from activity stack.
-        if (!session.checkLogin()) {
+        if (!userSession.checkLogin()) {
 
             Intent myIntent = new Intent(MainActivity.this, LoginActivity.class);
 
@@ -73,16 +74,16 @@ public class MainActivity extends AppCompatActivity {
                 AppEnvironment.setAndroidId(dev_AndroidId);
             }
             // Set userName in UI
-            String tempEmail = session.getUserEmail();
-            System.out.println("Login Found: " + tempEmail);
+            userEmail = userSession.getUserEmail();
+            System.out.println("Login Found: " + userEmail);
             tvUserName = (TextView) findViewById(R.id.tvUserName);
-            tvUserName.setText(tempEmail);
+            tvUserName.setText(userEmail);
 
             // TODO: Generate UniqueDevice Name
             // Currently using 'First4Char of userEmail' + 'Model'
 
             StringBuilder sb = new StringBuilder();
-            sb.append(tempEmail.substring(0, Math.min(tempEmail.length(), 4)));
+            sb.append(userEmail.substring(0, Math.min(userEmail.length(), 4)));
             sb.append(DeviceInfo.getModel_name());
 
             // Set unique userDeviceName in AppEnvironment, UI
@@ -100,11 +101,11 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(MainActivity.this,
                         PerformTestActivity.class);
+                intent.putExtra("user_email", userEmail);
                 startActivity(intent);
 
             }
         });
-
 
         // Button to go to 'Score' activity
         btnCheckScore = (Button) findViewById(R.id.btnScore);
@@ -112,13 +113,25 @@ public class MainActivity extends AppCompatActivity {
         btnCheckScore.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                Intent intent = new Intent(MainActivity.this,
-                        PerformTestActivity.class);
-                startActivity(intent);
+                if (!testResultSession.isTestResultAvailable()) {
+
+                    Intent intent = new Intent(MainActivity.this,
+                            PerformTestActivity.class);
+                    intent.putExtra("user_email", userEmail);
+                    startActivity(intent);
+
+                } else {
+                    String result = testResultSession.getTestResult(userEmail);
+                    Intent intent = new Intent(MainActivity.this,
+                            ScoreActivity.class);
+                    intent.putExtra("user_email", userEmail);
+                    intent.putExtra("test_result", result);
+                    startActivity(intent);
+
+                }
 
             }
         });
-
 
         // Button to go to 'Advisory' activity
         btnCheckAdvisory = (Button) findViewById(R.id.btnReco);
@@ -126,13 +139,26 @@ public class MainActivity extends AppCompatActivity {
         btnCheckAdvisory.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                Intent intent = new Intent(MainActivity.this,
-                        PerformTestActivity.class);
-                startActivity(intent);
+                if (!testResultSession.isTestResultAvailable()) {
+
+
+
+                    Intent intent = new Intent(MainActivity.this,
+                            PerformTestActivity.class);
+                    intent.putExtra("user_email", userEmail);
+                    startActivity(intent);
+                } else {
+
+                    String result = testResultSession.getTestResult(userEmail);
+                    Intent intent = new Intent(MainActivity.this,
+                            AdvisoryActivity.class);
+                    intent.putExtra("user_email", userEmail);
+                    intent.putExtra("test_result", result);
+                    startActivity(intent);
+                }
 
             }
         });
-
 
     }
 
@@ -140,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
 
-        if (!session.checkLogin()) {
+        if (!userSession.checkLogin()) {
 
             Intent myIntent = new Intent(MainActivity.this, LoginActivity.class);
 
@@ -174,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.menu_logout:
                 setToastMessage("Signing out",Toast.LENGTH_SHORT);
-                session.logoutUser();
+                userSession.logoutUser();
                 return true;
 
             case R.id.menu_about:

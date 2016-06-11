@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import net.HTTP_Utility;
+import net.HTTPS_Utility;
 import net.Network_Access;
 
 import java.util.Date;
@@ -34,6 +34,7 @@ import models.DeviceInfo;
 import models.FinalScoreInfo;
 import models.PhoneParameter;
 import models.TestInfo;
+import session.TestResultSessionManager;
 import setting.AppEnvironment;
 import setting.EnumValues;
 import setting.TempConfigFIle;
@@ -45,7 +46,9 @@ public class PerformTestActivity extends Activity {
     Button btnToBeRemoved;
     Button btnCheckScore;
     Button btnCheckAdvisory;
-    String score_result;
+    String test_result;
+
+    TestResultSessionManager sessionTestResult;
 
     PhoneParameter objParamData = null;
     DeviceInfo objDeviceInfo = null;
@@ -66,7 +69,7 @@ public class PerformTestActivity extends Activity {
 
                 Intent intent = new Intent(PerformTestActivity.this,
                         ScoreActivity.class);
-                intent.putExtra("score_result", score_result);
+                intent.putExtra("score_result", test_result);
                 startActivity(intent);
 
             }
@@ -81,7 +84,7 @@ public class PerformTestActivity extends Activity {
 
                 Intent intent = new Intent(PerformTestActivity.this,
                         AdvisoryActivity.class);
-                intent.putExtra("score_result", score_result);
+                intent.putExtra("score_result", test_result);
                 startActivity(intent);
                 startActivity(intent);
 
@@ -173,7 +176,9 @@ public class PerformTestActivity extends Activity {
 
 
         // Perform HTTP Post
-        HTTP_Utility objHTTP = new HTTP_Utility();
+        HTTPS_Utility objHTTP = new HTTPS_Utility();
+        objHTTP.initSSL_ForHTTPS(getApplicationContext());
+
         String response = objHTTP.getSendParameter(TempConfigFIle.hostNameForTest, "POST", AppEnvironment.DEF_HTTP_TIMEOUT, jsonString_TestParam);
         Log.i("PerformTestActivity", "Received String : " + response);
 
@@ -262,13 +267,23 @@ public class PerformTestActivity extends Activity {
             Gson gson = gsonBuilder.create();
 
             objFinalScore = gson.fromJson(result, FinalScoreInfo.class);
-            score_result = result;
+            test_result = result;
 
             if (objFinalScore != null) {
                 if (objFinalScore.getScoreStatus() == 1) {
+
+                    // TODO: Verify if it works
+
+                    // Initialize session object
+                    sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
+                    Bundle yourBundle = getIntent().getExtras();
+                    String emailFromIntent = yourBundle.getString("user_email");
+                    sessionTestResult.setTestResult(emailFromIntent,test_result);
+
+
                     Intent intent = new Intent(PerformTestActivity.this,
                             ScoreActivity.class);
-                    intent.putExtra("score_result", score_result);
+                    intent.putExtra("test_result", test_result);
                     setToastMessage("Displaying Score", Toast.LENGTH_SHORT);
                     startActivity(intent);
                 }

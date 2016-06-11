@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import net.HTTP_Utility;
+import net.HTTPS_Utility;
 import net.Network_Access;
 
 import java.text.DecimalFormat;
@@ -46,8 +46,8 @@ public class ScoreActivity extends AppCompatActivity {
                 Intent intent = new Intent(ScoreActivity.this,
                         AdvisoryActivity.class);
                 Bundle yourBundle = getIntent().getExtras();
-                String jsonScoreResult = yourBundle.getString("score_result");
-                intent.putExtra("score_result", jsonScoreResult);
+                String jsonScoreResult = yourBundle.getString("test_result");
+                intent.putExtra("test_result", jsonScoreResult);
                 startActivity(intent);
 
             }
@@ -55,7 +55,7 @@ public class ScoreActivity extends AppCompatActivity {
 
 
         Bundle yourBundle = getIntent().getExtras();
-        String jsonScoreResult = yourBundle.getString("score_result");
+        String jsonScoreResult = yourBundle.getString("test_result");
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
@@ -105,7 +105,8 @@ public class ScoreActivity extends AppCompatActivity {
     protected String getScoreFromScoreId(int id) {
 
         // Perform HTTP Post
-        HTTP_Utility objHTTP = new HTTP_Utility();
+        HTTPS_Utility objHTTP = new HTTPS_Utility();
+        objHTTP.initSSL_ForHTTPS(getApplicationContext());
         String response = objHTTP.getSendParameter(TempConfigFIle.hostNameForScore, "POST", AppEnvironment.DEF_HTTP_TIMEOUT, String.valueOf(id));
         // Log.i("HTTP Response PerformTestActivity", "Received String : " +response);
 

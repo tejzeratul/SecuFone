@@ -29,7 +29,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.HTTP_Utility;
+import net.HTTPS_Utility;
 import net.Network_Access;
 
 import java.util.ArrayList;
@@ -72,9 +72,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     private EditText mPassword2View;
 
     private EditText mNameView;
-    private EditText mCountryView;
-    private EditText mStateView;
-    private EditText mCityView;
+
 
     private TextView tvLoginText;
     private View mProgressView;
@@ -134,9 +132,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             }
         });
 
-        mCountryView = (EditText) findViewById(R.id.country);
-        mCityView = (EditText) findViewById(R.id.city);
-        mStateView = (EditText) findViewById(R.id.state);
 
 
         Button mEmailSignUpButton = (Button) findViewById(R.id.email_register_button);
@@ -217,9 +212,11 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         String password1 = mPassword1View.getText().toString().trim();
         String password2 = mPassword2View.getText().toString().trim();
         String name = mNameView.getText().toString().trim().toLowerCase();
-        String country = mCountryView.getText().toString().trim().toLowerCase();
-        String city = mCityView.getText().toString().trim().toLowerCase();
-        String state = mStateView.getText().toString().trim().toLowerCase();
+
+        // TODO: Get this from Android Location, if possible otherwise use unknown
+        String country="Unknown";
+        String city="Unknown";
+        String state="Unknown";
 
         boolean cancel = false;
         View focusView = null;
@@ -407,7 +404,8 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             paramPost.put("date", mDateCreated);
 
             // Perform HTTP Post
-            HTTP_Utility objHTTP = new HTTP_Utility();
+            HTTPS_Utility objHTTP = new HTTPS_Utility();
+            objHTTP.initSSL_ForHTTPS(getApplicationContext());
             String response = objHTTP.performPostCall(TempConfigFIle.hostNameForRegister, "POST", AppEnvironment.DEF_HTTP_TIMEOUT, paramPost);
             System.out.println("Response: " + response);
 
