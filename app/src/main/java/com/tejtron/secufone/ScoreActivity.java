@@ -25,7 +25,7 @@ import setting.TempConfigFIle;
 
 public class ScoreActivity extends AppCompatActivity {
 
-    FinalScoreInfo objFinalScore=null;
+    FinalScoreInfo objFinalScore = null;
     TextView tvYourScore;
     TextView tvMeanScore;
     TextView tvGlobalScore;
@@ -67,35 +67,33 @@ public class ScoreActivity extends AppCompatActivity {
         tvMeanScore = (TextView) findViewById(R.id.tvModelScore);
         tvGlobalScore = (TextView) findViewById(R.id.tvGlobalScore);
 
-        if (objFinalScore.getScoreStatus() == 1) {
+        if (objFinalScore != null) {
+            if (objFinalScore.getScoreStatus() == 1) {
 
-            DecimalFormat df2 = new DecimalFormat(".##");
+                DecimalFormat df2 = new DecimalFormat(".##");
 
-            tvYourScore.setText(String.valueOf(df2.format(objFinalScore.getFinalTestScore())));
-            tvMeanScore.setText(String.valueOf(df2.format(objFinalScore.getFinalModelMeanScore())));
-            tvGlobalScore.setText(String.valueOf(df2.format(objFinalScore.getFinalGlobalMeanScore())));
+                tvYourScore.setText(String.valueOf(df2.format(objFinalScore.getFinalTestScore())));
+                tvMeanScore.setText(String.valueOf(df2.format(objFinalScore.getFinalModelMeanScore())));
+                tvGlobalScore.setText(String.valueOf(df2.format(objFinalScore.getFinalGlobalMeanScore())));
 
-            if(objFinalScore.getAdvisoryStatus()==1) {
-                btnDispAdvisory.setEnabled(true);
+                if (objFinalScore.getAdvisoryStatus() == 1) {
+                    btnDispAdvisory.setEnabled(true);
+                }
             }
         } else {
-
-            if (objFinalScore.getScoreStatus() == 0) {
-
-                System.out.println("ScoreActivity Status is 0");
+            System.out.println("ScoreActivity Status is 0");
 
 
-                // Check Network Access
-                Network_Access objNetworkAccess=new Network_Access();
-                boolean isNetConnected=objNetworkAccess.isNetworkConnected(getApplicationContext());
+            // Check Network Access
+            Network_Access objNetworkAccess = new Network_Access();
+            boolean isNetConnected = objNetworkAccess.isNetworkConnected(getApplicationContext());
 
-                if(isNetConnected) {
+            if (isNetConnected) {
 
-                    // To fetch Score in background using AsyncTask
-                    new AsyncTaskFetchScore().execute(objFinalScore.getTestId());
-                } else {
-                    setToastMessage("Network unavailable",Toast.LENGTH_LONG);
-                }
+                // To fetch Score in background using AsyncTask
+                new AsyncTaskFetchScore().execute(objFinalScore.getTestId());
+            } else {
+                setToastMessage("Network unavailable", Toast.LENGTH_LONG);
             }
 
         }
@@ -142,12 +140,11 @@ public class ScoreActivity extends AppCompatActivity {
             Log.i("PerformTestActivity", "Response onPostExecute: " + result);
 
 
-
-                Intent intent = new Intent(ScoreActivity.this,
-                        ScoreActivity.class);
-                intent.putExtra("score_result", result);
-                System.out.println("ScoreActivity Starting again");
-                startActivity(intent);
+            Intent intent = new Intent(ScoreActivity.this,
+                    ScoreActivity.class);
+            intent.putExtra("score_result", result);
+            System.out.println("ScoreActivity Starting again");
+            startActivity(intent);
 
         }
 

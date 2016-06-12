@@ -35,6 +35,7 @@ import models.FinalScoreInfo;
 import models.PhoneParameter;
 import models.TestInfo;
 import session.TestResultSessionManager;
+import session.UserSessionManager;
 import setting.AppEnvironment;
 import setting.EnumValues;
 import setting.TempConfigFIle;
@@ -49,6 +50,7 @@ public class PerformTestActivity extends Activity {
     String test_result;
 
     TestResultSessionManager sessionTestResult;
+    UserSessionManager sessionUser;
 
     PhoneParameter objParamData = null;
     DeviceInfo objDeviceInfo = null;
@@ -69,7 +71,21 @@ public class PerformTestActivity extends Activity {
 
                 Intent intent = new Intent(PerformTestActivity.this,
                         ScoreActivity.class);
-                intent.putExtra("score_result", test_result);
+
+                if (test_result == null) {
+                    Bundle yourBundle = getIntent().getExtras();
+                    test_result = yourBundle.getString("test_result");
+
+                    if (test_result == null) {
+
+                        sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
+                        sessionUser = new UserSessionManager(MainActivity.getContext());
+
+                        test_result = sessionTestResult.getTestResult(sessionUser.getUserEmail());
+
+                    }
+                }
+                intent.putExtra("test_result", test_result);
                 startActivity(intent);
 
             }
@@ -84,8 +100,22 @@ public class PerformTestActivity extends Activity {
 
                 Intent intent = new Intent(PerformTestActivity.this,
                         AdvisoryActivity.class);
-                intent.putExtra("score_result", test_result);
-                startActivity(intent);
+
+                if (test_result == null) {
+                    Bundle yourBundle = getIntent().getExtras();
+                    test_result = yourBundle.getString("test_result");
+
+                    if (test_result == null) {
+
+                        sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
+                        sessionUser = new UserSessionManager(MainActivity.getContext());
+
+                        test_result = sessionTestResult.getTestResult(sessionUser.getUserEmail());
+
+                    }
+                }
+
+                intent.putExtra("test_result", test_result);
                 startActivity(intent);
 
             }
@@ -96,15 +126,15 @@ public class PerformTestActivity extends Activity {
 
 
         // Check Network Access
-        Network_Access objNetworkAccess=new Network_Access();
-        boolean isNetConnected=objNetworkAccess.isNetworkConnected(getApplicationContext());
+        Network_Access objNetworkAccess = new Network_Access();
+        boolean isNetConnected = objNetworkAccess.isNetworkConnected(getApplicationContext());
 
-        if(isNetConnected) {
+        if (isNetConnected) {
 
             // To calculate parameters in background using AsyncTask
             new AsyncTaskCalculateParam().execute("5");
         } else {
-            setToastMessage("Network unavailable",Toast.LENGTH_LONG);
+            setToastMessage("Network unavailable", Toast.LENGTH_LONG);
         }
     }
 
@@ -278,7 +308,7 @@ public class PerformTestActivity extends Activity {
                     sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
                     Bundle yourBundle = getIntent().getExtras();
                     String emailFromIntent = yourBundle.getString("user_email");
-                    sessionTestResult.setTestResult(emailFromIntent,test_result);
+                    sessionTestResult.setTestResult(emailFromIntent, test_result);
 
 
                     Intent intent = new Intent(PerformTestActivity.this,
