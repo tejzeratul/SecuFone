@@ -13,7 +13,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Logged in as xyz@gmail.com"
+        android:text=""
         android:layout_alignParentTop="true"
         android:layout_marginLeft="4dp"
         android:layout_marginStart="4dp"
@@ -78,7 +78,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Device Name: Tej G3"
+        android:text=""
         android:id="@+id/tvDeviceName"
         android:textColor="@color/colorAppPrimaryText"
         android:layout_marginLeft="4dp"
