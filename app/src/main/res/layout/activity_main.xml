@@ -17,6 +17,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="4dp"
         android:layout_marginStart="4dp"
+        android:textColor="@color/colorAppPrimaryText"
         android:id="@+id/tvUserName" />
 
     <Button
@@ -79,6 +80,7 @@
         android:layout_height="wrap_content"
         android:text="Device Name: Tej G3"
         android:id="@+id/tvDeviceName"
+        android:textColor="@color/colorAppPrimaryText"
         android:layout_marginLeft="4dp"
         android:layout_marginStart="4dp"
         android:layout_marginBottom="4dp"

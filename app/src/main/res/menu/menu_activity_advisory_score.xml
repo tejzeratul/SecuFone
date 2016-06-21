@@ -3,4 +3,10 @@
     <item
         android:id="@+id/menu_logout"
         android:title="@string/action_sign_out"/>
+    <item
+        android:id="@+id/menu_about"
+        android:title="About App"/>
+    <item
+        android:id="@+id/menu_home"
+        android:title="Home Screen"/>
 </menu>

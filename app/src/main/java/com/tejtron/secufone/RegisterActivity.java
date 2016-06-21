@@ -20,6 +20,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -144,6 +146,30 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         mRegisterFormView = findViewById(R.id.register_form);
         mProgressView = findViewById(R.id.login_progress);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_activity_register, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.menu_about:
+                Intent intent = new Intent(RegisterActivity.this,
+                        AboutAppActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 
     /**
      * Attempts to register the account specified by the login form.

@@ -26,6 +26,7 @@
         android:id="@+id/tvTextFinalScore"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:textColor="@color/colorAppPrimaryText"
         android:layout_marginTop="50dp" />
 
     <!-- bg ##2d2d2d  #748BB5 -->
@@ -52,6 +53,7 @@
         android:id="@+id/tvTextGlobalScore"
         android:layout_below="@id/tvFinalScore"
         android:layout_centerHorizontal="true"
+        android:textColor="@color/colorAppPrimaryText"
         android:layout_marginTop="60dp" />
 
     <TextView
@@ -77,6 +79,7 @@
         android:id="@+id/tvTextModelScore"
         android:layout_below="@id/tvGlobalScore"
         android:layout_centerHorizontal="true"
+        android:textColor="@color/colorAppPrimaryText"
         android:layout_marginTop="60dp" />
 
     <TextView

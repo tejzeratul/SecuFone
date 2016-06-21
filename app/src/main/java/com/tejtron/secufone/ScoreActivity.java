@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -161,6 +163,34 @@ public class ScoreActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_activity_advisory_score, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.menu_home:
+                Intent intentHome = new Intent(ScoreActivity.this,
+                        MainActivity.class);
+                startActivity(intentHome);
+                return true;
+            case R.id.menu_about:
+                Intent intent = new Intent(ScoreActivity.this,
+                        AboutAppActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public void setToastMessage(String message, int type) {
