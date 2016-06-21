@@ -7,9 +7,9 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-    <style name="TaskButton" parent="Theme.AppCompat.Light">
-        <item name="colorControlHighlight">@color/colorAccent</item>
-        <item name="colorButtonNormal">@color/colorSeaBlue</item>
+    <style name="AppButton" parent="Theme.AppCompat.Light">
+        <item name="colorControlHighlight">@color/colorAppPrimaryDark</item>
+        <item name="colorButtonNormal">@color/colorAppPrimary</item>
     </style>
     <style name="TerminalButton" parent="Theme.AppCompat.Light">
         <item name="colorControlHighlight">@color/colorBtnMainDark</item>

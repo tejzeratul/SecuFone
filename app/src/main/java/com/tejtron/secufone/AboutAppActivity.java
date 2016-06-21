@@ -41,7 +41,7 @@ public class AboutAppActivity extends AppCompatActivity {
         String line5 = "--Developer--";
         String line6 = "Tejas Padliya";
 
-        line = line1 + "\n" + "\n" + line2 + "\n" + "\n" + "\n" + "\n" + "\n" + line5 + "\n" + line6;
+        line = line1 + "\n" + "\n" + line2 + "\n" + "\n" + "\n" + line5 + "\n" + line6;
 
         etTextAbout.setText(line);
         etTextAbout.setKeyListener(null);

@@ -28,7 +28,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:theme="@style/TaskButton"
+        android:theme="@style/AppButton"
         android:visibility="invisible"
         />
 
@@ -44,7 +44,7 @@
         android:layout_alignRight="@id/btnInvisible"
         android:layout_alignEnd="@id/btnInvisible"
         android:layout_marginBottom="40dp"
-        android:theme="@style/TaskButton"
+        android:theme="@style/AppButton"
         />
 
     <Button
@@ -57,7 +57,7 @@
         android:layout_alignStart="@id/btnInvisible"
         android:layout_alignRight="@id/btnInvisible"
         android:layout_alignEnd="@id/btnInvisible"
-        android:theme="@style/TaskButton"
+        android:theme="@style/AppButton"
         />
 
     <Button
@@ -71,7 +71,7 @@
         android:layout_alignEnd="@id/btnInvisible"
         android:layout_below="@+id/btnScore"
         android:layout_marginTop="40dp"
-        android:theme="@style/TaskButton"
+        android:theme="@style/AppButton"
         />
 
     <TextView

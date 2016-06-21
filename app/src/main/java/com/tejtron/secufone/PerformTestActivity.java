@@ -284,42 +284,44 @@ public class PerformTestActivity extends Activity {
         protected void onPostExecute(String result) {
 
             // execution of result of Long time consuming operation
-            progressDialog.dismiss();
-            btnCheckAdvisory.setEnabled(true);
-            btnCheckScore.setEnabled(true);
-            Log.i("PerformTestActivity", "Response onPostExecute: " + result);
 
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            // Allowing the serialization of static fields
-            gsonBuilder.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
-            gsonBuilder.serializeNulls();
-            // Creates a Gson instance based on the current configuration
-            Gson gson = gsonBuilder.create();
+                progressDialog.dismiss();
+                btnCheckAdvisory.setEnabled(true);
+                btnCheckScore.setEnabled(true);
+                Log.i("PerformTestActivity", "Response onPostExecute: " + result);
 
-            objFinalScore = gson.fromJson(result, FinalScoreInfo.class);
-            test_result = result;
+                GsonBuilder gsonBuilder = new GsonBuilder();
+                // Allowing the serialization of static fields
+                gsonBuilder.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
+                gsonBuilder.serializeNulls();
+                // Creates a Gson instance based on the current configuration
+                Gson gson = gsonBuilder.create();
 
-            if (objFinalScore != null) {
-                if (objFinalScore.getScoreStatus() == 1) {
+                objFinalScore = gson.fromJson(result, FinalScoreInfo.class);
+                test_result = result;
 
-                    // TODO: Verify if it works
+                if (objFinalScore != null) {
+                    if (objFinalScore.getScoreStatus() == 1) {
 
-                    // Initialize session object
-                    sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
-                    Bundle yourBundle = getIntent().getExtras();
-                    String emailFromIntent = yourBundle.getString("user_email");
-                    sessionTestResult.setTestResult(emailFromIntent, test_result);
+                        // TODO: Verify if it works
+
+                        // Initialize session object
+                        sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
+                        Bundle yourBundle = getIntent().getExtras();
+                        String emailFromIntent = yourBundle.getString("user_email");
+                        sessionTestResult.setTestResult(emailFromIntent, test_result);
 
 
-                    Intent intent = new Intent(PerformTestActivity.this,
-                            ScoreActivity.class);
-                    intent.putExtra("test_result", test_result);
-                    setToastMessage("Displaying Score", Toast.LENGTH_SHORT);
-                    startActivity(intent);
+                        Intent intent = new Intent(PerformTestActivity.this,
+                                ScoreActivity.class);
+                        intent.putExtra("test_result", test_result);
+                        setToastMessage("Displaying Score", Toast.LENGTH_SHORT);
+                        startActivity(intent);
+                    }
+                } else {
+                    Log.i("PerformTestActivity", "ObjectFinalScore is null: " + result);
                 }
-            } else {
-                Log.i("PerformTestActivity", "ObjectFinalScore is null: " + result);
-            }
+
         }
 
         @Override
