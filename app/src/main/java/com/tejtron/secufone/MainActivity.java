@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Session class instance
         userSession = new UserSessionManager(getApplicationContext());
-        testResultSession =new TestResultSessionManager(getApplicationContext());
+        testResultSession = new TestResultSessionManager(getApplicationContext());
 
         // Check user login (this is the important point)
         // If User is not logged in , This will redirect user to LoginActivity
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             AppEnvironment.setApiLevel(Build.VERSION.SDK_INT);
 
             // Set AppEnvironment-AndroidId (if not set)
-            if(AppEnvironment.getAndroidId().equals(AppEnvironment.DEF_ANDROID_ID)) {
+            if (AppEnvironment.getAndroidId().equals(AppEnvironment.DEF_ANDROID_ID)) {
                 String dev_AndroidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
                 if (dev_AndroidId.trim().isEmpty() || dev_AndroidId == null)
@@ -129,7 +129,6 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
 
                 }
-
             }
         });
 
@@ -140,8 +139,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 if (!testResultSession.isTestResultAvailable()) {
-
-
 
                     Intent intent = new Intent(MainActivity.this,
                             PerformTestActivity.class);
@@ -156,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtra("test_result", result);
                     startActivity(intent);
                 }
-
             }
         });
 
@@ -193,13 +189,12 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
             case R.id.menu_logout:
-                setToastMessage("Signing out",Toast.LENGTH_SHORT);
+                setToastMessage("Signing out", Toast.LENGTH_SHORT);
                 userSession.logoutUser();
                 return true;
 
@@ -212,6 +207,4 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
 }

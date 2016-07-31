@@ -2,7 +2,6 @@ package com.tejtron.secufone;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,11 +12,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import net.HTTPS_Utility;
 import net.Network_Access;
+import net.ResultInterface;
+import net.VolleyService;
 
 import java.text.DecimalFormat;
 
@@ -32,6 +33,15 @@ public class ScoreActivity extends AppCompatActivity {
     TextView tvMeanScore;
     TextView tvGlobalScore;
     Button btnDispAdvisory;
+
+    private String resp;
+    ProgressDialog progressDialog;
+
+    // Volley related.
+    ResultInterface mResultCallback = null;
+    VolleyService mVolleyService;
+
+    private String TAG = "ScoreActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +65,6 @@ public class ScoreActivity extends AppCompatActivity {
             }
         });
 
-
         Bundle yourBundle = getIntent().getExtras();
         String jsonScoreResult = yourBundle.getString("test_result");
 
@@ -70,6 +79,7 @@ public class ScoreActivity extends AppCompatActivity {
         tvGlobalScore = (TextView) findViewById(R.id.tvGlobalScore);
 
         if (objFinalScore != null) {
+
             if (objFinalScore.getScoreStatus() == 1) {
 
                 DecimalFormat df2 = new DecimalFormat(".##");
@@ -85,7 +95,6 @@ public class ScoreActivity extends AppCompatActivity {
         } else {
             System.out.println("ScoreActivity Status is 0");
 
-
             // Check Network Access
             Network_Access objNetworkAccess = new Network_Access();
             boolean isNetConnected = objNetworkAccess.isNetworkConnected(getApplicationContext());
@@ -93,76 +102,23 @@ public class ScoreActivity extends AppCompatActivity {
             if (isNetConnected) {
 
                 // To fetch Score in background using AsyncTask
-                new AsyncTaskFetchScore().execute(objFinalScore.getTestId());
+                progressDialog = ProgressDialog.show(ScoreActivity.this,
+                        "ProgressDialog",
+                        "One moment");
+
+                int testId = -1;
+                if (objFinalScore != null)
+                    testId = objFinalScore.getTestId();
+
+                // Volley specific calls
+                initVolleyCallback();
+                performNetCall(testId);
+
             } else {
+
                 setToastMessage("Network unavailable", Toast.LENGTH_LONG);
             }
-
         }
-
-    }
-
-    protected String getScoreFromScoreId(int id) {
-
-        // Perform HTTP Post
-        HTTPS_Utility objHTTP = new HTTPS_Utility();
-        objHTTP.initSSL_ForHTTPS(getApplicationContext());
-        String response = objHTTP.getSendParameter(TempConfigFIle.hostNameForScore, "POST", AppEnvironment.DEF_HTTP_TIMEOUT, String.valueOf(id));
-        // Log.i("HTTP Response PerformTestActivity", "Received String : " +response);
-
-        return response;
-    }
-
-
-    private class AsyncTaskFetchScore extends AsyncTask<Integer, String, String> {
-
-        private String resp;
-        ProgressDialog progressDialog;
-
-        @Override
-        protected String doInBackground(Integer... params) {
-            publishProgress("One moment..."); // Calls onProgressUpdate()
-            try {
-
-                // TODO verify it works
-                resp = getScoreFromScoreId(params[0]);
-            } catch (Exception e) {
-                e.printStackTrace();
-                resp = e.getMessage();
-            }
-            return resp;
-        }
-
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            // execution of result of Long time consuming operation
-            progressDialog.dismiss();
-            Log.i("PerformTestActivity", "Response onPostExecute: " + result);
-
-
-            Intent intent = new Intent(ScoreActivity.this,
-                    ScoreActivity.class);
-            intent.putExtra("score_result", result);
-            System.out.println("ScoreActivity Starting again");
-            startActivity(intent);
-
-        }
-
-        @Override
-        protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(ScoreActivity.this,
-                    "ProgressDialog",
-                    "One moment");
-        }
-
-        @Override
-        protected void onProgressUpdate(String... text) {
-            //finalResult.setText(text[0]);
-
-        }
-
     }
 
     @Override
@@ -172,7 +128,6 @@ public class ScoreActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_activity_advisory_score, menu);
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -193,8 +148,45 @@ public class ScoreActivity extends AppCompatActivity {
         }
     }
 
-    public void setToastMessage(String message, int type) {
-        Toast.makeText(this, message, type).show();
+    void initVolleyCallback() {
+
+        mResultCallback = new ResultInterface() {
+
+            @Override
+            public void notifySuccess(String requestType, String response) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + response);
+
+                // execution of result of Long time consuming operation
+                progressDialog.dismiss();
+                Log.i("PerformTestActivity", "Response onPostExecute: " + response);
+
+
+                Intent intent = new Intent(ScoreActivity.this,
+                        ScoreActivity.class);
+                intent.putExtra("score_result", response);
+                System.out.println("ScoreActivity Starting again");
+                startActivity(intent);
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + error.getMessage());
+            }
+        };
     }
 
+    public void performNetCall(int id) {
+
+        mVolleyService = new VolleyService(mResultCallback, getApplicationContext());
+
+        // Perform POST call
+        mVolleyService.postDataVolley(AppEnvironment.DEF_HTTP_TIMEOUT, "POSTCALL", TempConfigFIle.hostNameForScore, String.valueOf(id));
+    }
+
+    public void setToastMessage(String message, int type) {
+
+        Toast.makeText(this, message, type).show();
+    }
 }

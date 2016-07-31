@@ -57,28 +57,40 @@ public class AdvisoryActivity extends AppCompatActivity {
         objFinalScore = gson.fromJson(jsonScoreResult, FinalScoreInfo.class);
 
         StringBuilder sb = new StringBuilder();
-        ArrayList<AdvisoryInfo> objAdvisoryInfoList = objFinalScore.getObjAdvisoryInfoList();
 
-        if (objFinalScore.getScoreStatus() == 1 && objFinalScore.getAdvisoryStatus() == 1) {
+        // TODO: Null check
+        if (objFinalScore != null) {
 
-            for (int i = 0; i < objAdvisoryInfoList.size(); i++) {
-                sb.append((i + 1) + ". ");
-                sb.append(objAdvisoryInfoList.get(i).getAdvisoryText());
-                sb.append(System.getProperty("line.separator"));
+            ArrayList<AdvisoryInfo> objAdvisoryInfoList = objFinalScore.getObjAdvisoryInfoList();
 
+            if (objFinalScore.getScoreStatus() == 1 && objFinalScore.getAdvisoryStatus() == 1) {
+
+                for (int i = 0; i < objAdvisoryInfoList.size(); i++) {
+                    sb.append((i + 1) + ". ");
+                    sb.append(objAdvisoryInfoList.get(i).getAdvisoryText());
+                    sb.append(System.getProperty("line.separator"));
+
+                }
+
+                if (objFinalScore.getScoreStatus() == 1) {
+                    btnDispScore.setEnabled(true);
+                }
             }
 
-            if (objFinalScore.getScoreStatus() == 1) {
-                btnDispScore.setEnabled(true);
+            String finalAdvisory = sb.toString().trim();
+
+            tvAdvisory = (TextView) findViewById(R.id.tvAdvisory);
+
+            if (finalAdvisory != null && !finalAdvisory.isEmpty()) {
+                tvAdvisory.setText(finalAdvisory);
             }
-        }
 
-        String finalAdvisory = sb.toString().trim();
+        } else {
 
-        tvAdvisory = (TextView) findViewById(R.id.tvAdvisory);
+            Intent intent = new Intent(AdvisoryActivity.this,
+                    com.tejtron.secufone.ScoreActivity.class);
 
-        if (finalAdvisory != null && !finalAdvisory.isEmpty()) {
-            tvAdvisory.setText(finalAdvisory);
+            startActivity(intent);
         }
     }
 
@@ -89,7 +101,6 @@ public class AdvisoryActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_activity_advisory_score, menu);
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -113,5 +124,4 @@ public class AdvisoryActivity extends AppCompatActivity {
     public void setToastMessage(String message, int type) {
         Toast.makeText(this, message, type).show();
     }
-
 }
