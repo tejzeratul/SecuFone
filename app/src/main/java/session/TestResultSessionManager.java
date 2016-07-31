@@ -1,12 +1,7 @@
 package session;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-
-import com.tejtron.secufone.MainActivity;
-
-import setting.AppEnvironment;
 
 /**
  * Created by Tejas on 5/31/2016.

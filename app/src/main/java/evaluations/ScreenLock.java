@@ -109,7 +109,6 @@ public class ScreenLock
 
                 if(km.isDeviceSecure()) {
 
-
                     return ScreenLock.PATTERN;
                 }
                 else

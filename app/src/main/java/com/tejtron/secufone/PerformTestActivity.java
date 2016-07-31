@@ -60,7 +60,7 @@ public class PerformTestActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select);
+        setContentView(R.layout.activity_perform);
         pContext = getApplicationContext();
 
         // To launch 'Score' activity

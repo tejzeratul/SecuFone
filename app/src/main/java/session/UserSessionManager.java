@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
-
-import com.tejtron.secufone.LoginActivity;
 import com.tejtron.secufone.MainActivity;
 
 import setting.AppEnvironment;
@@ -49,7 +47,7 @@ public class UserSessionManager {
         editor.putBoolean(IS_USER_LOGIN, true);
         editor.putString(KEY_NAME, userName);
         editor.putString(KEY_EMAIL, userEmail);
-        editor.putString(KEY_DEVICE_ID,deviceId);
+        editor.putString(KEY_DEVICE_ID, deviceId);
 
         editor.commit();
     }
@@ -78,7 +76,7 @@ public class UserSessionManager {
 
     public String getUserEmail() {
 
-        return pref.getString(KEY_EMAIL,"");
+        return pref.getString(KEY_EMAIL, "");
     }
 
 
