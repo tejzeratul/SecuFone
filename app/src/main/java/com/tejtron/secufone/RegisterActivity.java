@@ -3,93 +3,80 @@ package com.tejtron.secufone;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.util.Patterns;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.HTTPS_Utility;
-import net.Network_Access;
+import com.android.volley.VolleyError;
 
-import java.util.ArrayList;
+import net.Network_Access;
+import net.ResultInterface;
+import net.VolleyService;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map;
 
-import session.UserSessionManager;
 import setting.AppEnvironment;
 import setting.EncryptString;
 import setting.TempConfigFIle;
 import validate.UserValidation;
 import validate.Validation;
 
-import static android.Manifest.permission.READ_CONTACTS;
-
 /**
- * A login screen that offers login via email/password.
+ * A register screen that offers user registration.
  */
-public class RegisterActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
+public class RegisterActivity extends AppCompatActivity {
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserRegisterTask mAuthTask = null;
-    private Intent in;
-    UserSessionManager sessionLogin;
+    private UserRegisterProperty mAuthTask = null;
+    private Intent intentForLogin;
+    // UserSessionManager sessionLogin;
+
+    // Volley related.
+    ResultInterface mResultCallback = null;
+    VolleyService mVolleyService;
+
+    private String TAG = "RegisterActivity";
 
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPassword1View;
     private EditText mPassword2View;
-
     private EditText mNameView;
-
-
     private TextView tvLoginText;
     private View mProgressView;
     private View mRegisterFormView;
-
+    private Button mEmailSignUpButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-
         tvLoginText = (TextView) findViewById(R.id.link_to_login);
+        mPassword1View = (EditText) findViewById(R.id.password1);
+        mPassword2View = (EditText) findViewById(R.id.password2);
+        mEmailSignUpButton = (Button) findViewById(R.id.email_register_button);
 
         // Listening to register new account link
         tvLoginText.setOnClickListener(new View.OnClickListener() {
@@ -101,8 +88,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             }
         });
 
-
-        mPassword1View = (EditText) findViewById(R.id.password1);
         mPassword1View.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -112,12 +97,9 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             }
         });
 
-
-        mPassword2View = (EditText) findViewById(R.id.password2);
         mPassword2View.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-
 
                 return false;
             }
@@ -128,14 +110,10 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
 
-
                 return false;
             }
         });
 
-
-
-        Button mEmailSignUpButton = (Button) findViewById(R.id.email_register_button);
         mEmailSignUpButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -155,7 +133,6 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         return true;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -170,89 +147,9 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         }
     }
 
+    public void setToastMessage(String message, int type) {
 
-    /**
-     * Attempts to register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
-    private void attemptRegister() {
-        if (mAuthTask != null) {
-            return;
-        }
-
-        // Reset errors.
-        mEmailView.setError(null);
-        mPassword1View.setError(null);
-        mPassword2View.setError(null);
-        mNameView.setError(null);
-
-
-        // Store values at the time of the register attempt.
-        String email = mEmailView.getText().toString().trim().toLowerCase();
-        String password1 = mPassword1View.getText().toString().trim();
-        String password2 = mPassword2View.getText().toString().trim();
-        String name = mNameView.getText().toString().trim().toLowerCase();
-
-        // TODO: Get this from Android Location, if possible otherwise use unknown
-        String country="Unknown";
-        String city="Unknown";
-        String state="Unknown";
-
-        boolean cancel = false;
-        View focusView = null;
-
-        // Validation
-        UserValidation userValidate = new UserValidation();
-
-        // Check for a valid password, if the user entered one.
-        Validation validatePassword = userValidate.isPasswordValid(password1, password2);
-        if (!validatePassword.getStatus()) {
-            mPassword1View.setError(validatePassword.getErrorMessage());
-            focusView = mPassword1View;
-            cancel = true;
-        }
-
-        // Check for a valid email address.
-        Validation validateEmail = userValidate.isEmailValid(email);
-        if (!validateEmail.getStatus()) {
-            mEmailView.setError(validateEmail.getErrorMessage());
-            focusView = mEmailView;
-            cancel = true;
-        }
-
-        // Check for valid name
-        Validation validateName = userValidate.isNameValid(name);
-        if (!validateName.getStatus()) {
-            mNameView.setError(validateName.getErrorMessage());
-            focusView = mNameView;
-            cancel = true;
-        }
-
-        // Check for valid country,city,state
-        //TODO: validation for country, city, state
-
-
-        if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
-            focusView.requestFocus();
-        } else {
-
-
-            // Check Network Access
-            Network_Access objNetworkAccess=new Network_Access();
-            boolean isNetConnected=objNetworkAccess.isNetworkConnected(getApplicationContext());
-
-            if(isNetConnected) {
-
-                showProgress(true);
-                mAuthTask = new UserRegisterTask(email, password1, name, country, city, state);
-                mAuthTask.execute((Void) null);
-            } else {
-                setToastMessage("Network unavailable",Toast.LENGTH_LONG);
-            }
-        }
+        Toast.makeText(this, message, type).show();
     }
 
     /**
@@ -291,138 +188,192 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-
-        addEmailsToAutoComplete(emails);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-    }
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(RegisterActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mEmailView.setAdapter(adapter);
-    }
-
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
-    }
-
     /**
-     * Represents an asynchronous registration task used to authenticate
-     * the user.
+     * Attempts to register the account specified by the login form.
+     * If there are form errors (invalid email, missing fields, etc.), the
+     * errors are presented and no actual login attempt is made.
      */
-    public class UserRegisterTask extends AsyncTask<Void, Void, String> {
+    private void attemptRegister() {
 
-        private final String mEmail;
-        private final String mPassword;
-        private final String mName;
-        private final String mCountry;
-        private final String mCity;
-        private final String mState;
-        private final String mDateCreated;
-
-        UserRegisterTask(String email, String password, String name, String country, String state, String city) {
-            mEmail = email;
-            mPassword = password;
-            mCountry = country;
-            mName = name;
-            mCity = city;
-            mState = state;
-            mDateCreated = new Date().toString();
+        if (mAuthTask != null) {
+            return;
         }
 
-        @Override
-        protected String doInBackground(Void... params) {
+        // Reset errors.
+        mEmailView.setError(null);
+        mPassword1View.setError(null);
+        mPassword2View.setError(null);
+        mNameView.setError(null);
 
-            HashMap<String, String> paramPost = new HashMap<String, String>();
-            EncryptString es = new EncryptString();
-            String tempPassword = es.doEncryption(mPassword);
+        // Store values at the time of the register attempt.
+        String email = mEmailView.getText().toString().trim().toLowerCase();
+        String password1 = mPassword1View.getText().toString().trim();
+        String password2 = mPassword2View.getText().toString().trim();
+        String name = mNameView.getText().toString().trim().toLowerCase();
 
-            paramPost.put("email", mEmail);
-            paramPost.put("password", tempPassword);
-            paramPost.put("name", mName);
-            paramPost.put("country", mCountry);
-            paramPost.put("city", mCity);
-            paramPost.put("state", mState);
-            paramPost.put("date", mDateCreated);
+        // TODO: Get this from Android Location, if possible otherwise use unknown
+        String country = "Unknown";
+        String city = "Unknown";
+        String state = "Unknown";
 
-            // Perform HTTP Post
-            HTTPS_Utility objHTTP = new HTTPS_Utility();
-            objHTTP.initSSL_ForHTTPS(getApplicationContext());
-            String response = objHTTP.performPostCall(TempConfigFIle.hostNameForRegister, "POST", AppEnvironment.DEF_HTTP_TIMEOUT, paramPost);
-            System.out.println("Response: " + response);
+        boolean cancel = false;
+        View focusView = null;
 
-            return response;
+        // Validation
+        UserValidation userValidate = new UserValidation();
+
+        // Check for a valid password, if the user entered one.
+        Validation validatePassword = userValidate.isPasswordValid(password1, password2);
+        if (!validatePassword.getStatus()) {
+            mPassword1View.setError(validatePassword.getErrorMessage());
+            focusView = mPassword1View;
+            cancel = true;
         }
 
-        @Override
-        protected void onPostExecute(final String response) {
-            mAuthTask = null;
-            showProgress(false);
+        // Check for a valid email address.
+        Validation validateEmail = userValidate.isEmailValid(email);
+        if (!validateEmail.getStatus()) {
+            mEmailView.setError(validateEmail.getErrorMessage());
+            focusView = mEmailView;
+            cancel = true;
+        }
 
-            if (response.equalsIgnoreCase("true")) {
+        // Check for valid name
+        Validation validateName = userValidate.isNameValid(name);
+        if (!validateName.getStatus()) {
+            mNameView.setError(validateName.getErrorMessage());
+            focusView = mNameView;
+            cancel = true;
+        }
 
-                setToastMessage("Sign up success", Toast.LENGTH_LONG);
+        // Check for valid country,city,state
+        //TODO: validation for country, city, state
 
-                // Call Login Activity
-                in = new Intent(RegisterActivity.this, LoginActivity.class);
-                startActivity(in);
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
+        } else {
 
-                finish();
+            // Check Network Access
+            Network_Access objNetworkAccess = new Network_Access();
+            boolean isNetConnected = objNetworkAccess.isNetworkConnected(getApplicationContext());
+
+            if (isNetConnected) {
+
+                showProgress(true);
+                mAuthTask = new UserRegisterProperty(email, password1, name, country, city, state);
+                initVolleyCallback();
+                performNetCall();
 
             } else {
-                mEmailView.setError(getString(R.string.error_user_exist));
-                mEmailView.requestFocus();
+                setToastMessage("Network unavailable", Toast.LENGTH_LONG);
             }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
         }
     }
 
-    public void setToastMessage(String message, int type) {
-        Toast.makeText(this, message, type).show();
+    void initVolleyCallback() {
+
+        mResultCallback = new ResultInterface() {
+            @Override
+            public void notifySuccess(String requestType, String response) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + response);
+
+                mAuthTask = null;
+                showProgress(false);
+
+                setToastMessage("Response received" + response, Toast.LENGTH_LONG);
+
+                if (response.trim().equalsIgnoreCase("true")) {
+                    setToastMessage("Sign up success", Toast.LENGTH_LONG);
+
+                    // Call Login Activity
+                    intentForLogin = new Intent(RegisterActivity.this, LoginActivity.class);
+                    startActivity(intentForLogin);
+
+                    finish();
+
+                } else {
+                    mEmailView.setError(getString(R.string.error_user_exist));
+                    mEmailView.requestFocus();
+                }
+            }
+
+            @Override
+            public void notifyError(String requestType, VolleyError error) {
+                Log.d(TAG, "Volley requester " + requestType);
+                Log.d(TAG, "Volley JSON post" + error.getMessage());
+            }
+        };
+    }
+
+    public void performNetCall() {
+
+        mVolleyService = new VolleyService(mResultCallback, getApplicationContext());
+
+        HashMap<String, String> paramPost = new HashMap<String, String>();
+        EncryptString es = new EncryptString();
+        String tempPassword = es.doEncryption(UserRegisterProperty.mPassword);
+
+        paramPost.put("email", UserRegisterProperty.mEmail);
+        paramPost.put("password", tempPassword);
+        paramPost.put("name", UserRegisterProperty.mName);
+        paramPost.put("country", UserRegisterProperty.mCountry);
+        paramPost.put("city", UserRegisterProperty.mCity);
+        paramPost.put("state", UserRegisterProperty.mState);
+        paramPost.put("date", UserRegisterProperty.mDateCreated);
+
+        try {
+            UserRegisterProperty.requestStr = getPostDataString(paramPost);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        // Perform POST call
+        mVolleyService.postDataVolley(AppEnvironment.DEF_HTTP_TIMEOUT, "POSTCALL", TempConfigFIle.hostNameForRegister, UserRegisterProperty.requestStr);
+    }
+
+    private String getPostDataString(HashMap<String, String> params) throws UnsupportedEncodingException {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            if (first)
+                first = false;
+            else
+                result.append("&");
+
+            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        }
+
+        return result.toString();
     }
 }
 
+/**
+ * Represents an asynchronous registration task used to authenticate
+ * the user.
+ */
+class UserRegisterProperty {
+
+    static String mEmail;
+    static String mPassword;
+    static String mName;
+    static String mCountry;
+    static String mCity;
+    static String mState;
+    static String mDateCreated;
+    static String requestStr;
+
+    UserRegisterProperty(String email, String password, String name, String country, String state, String city) {
+        mEmail = email;
+        mPassword = password;
+        mCountry = country;
+        mName = name;
+        mCity = city;
+        mState = state;
+        mDateCreated = new Date().toString();
+    }
+}

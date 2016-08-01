@@ -5,12 +5,15 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
+import android.content.res.Configuration;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -32,6 +35,7 @@ import evaluations.StorageEncrypt;
 import file.FileProcessing;
 import models.DeviceInfo;
 import models.FinalScoreInfo;
+import models.ParameterStatus;
 import models.PhoneParameter;
 import models.TestInfo;
 import session.TestResultSessionManager;
@@ -48,6 +52,8 @@ public class PerformTestActivity extends Activity {
     Button btnCheckScore;
     Button btnCheckAdvisory;
     String test_result;
+    Handler handler;
+    static ProgressDialog pd;
 
     TestResultSessionManager sessionTestResult;
     UserSessionManager sessionUser;
@@ -62,6 +68,12 @@ public class PerformTestActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_perform);
         pContext = getApplicationContext();
+
+        if (savedInstanceState != null) {
+
+            ParameterStatus.dialogScheduled = savedInstanceState.getBoolean("DSCH");
+            ParameterStatus.scheduled = savedInstanceState.getBoolean("SCH");
+        }
 
         // To launch 'Score' activity
         btnCheckScore = (Button) findViewById(R.id.btnCScore);
@@ -90,7 +102,6 @@ public class PerformTestActivity extends Activity {
 
             }
         });
-
 
         // To launch 'Advisory' activity
         btnCheckAdvisory = (Button) findViewById(R.id.btnCAdvisory);
@@ -124,7 +135,6 @@ public class PerformTestActivity extends Activity {
         btnCheckAdvisory.setEnabled(false);
         btnCheckScore.setEnabled(false);
 
-
         // Check Network Access
         Network_Access objNetworkAccess = new Network_Access();
         boolean isNetConnected = objNetworkAccess.isNetworkConnected(getApplicationContext());
@@ -132,9 +142,110 @@ public class PerformTestActivity extends Activity {
         if (isNetConnected) {
 
             // To calculate parameters in background using AsyncTask
-            new AsyncTaskCalculateParam().execute("5");
+
+            // new AsyncTaskCalculateParam().execute("5");
+            if (ParameterStatus.dialogScheduled == false) {
+                ParameterStatus.dialogScheduled = true;
+                startDialog();
+
+            }
+
         } else {
             setToastMessage("Network unavailable", Toast.LENGTH_LONG);
+        }
+
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                pd.dismiss();
+
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                btnCheckAdvisory.setEnabled(true);
+                btnCheckScore.setEnabled(true);
+
+                String result = (String) msg.obj;
+                Log.i("PerformTestActivity", "Response onPostExecute: " + result);
+
+                GsonBuilder gsonBuilder = new GsonBuilder();
+                // Allowing the serialization of static fields
+                gsonBuilder.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
+                gsonBuilder.serializeNulls();
+                // Creates a Gson instance based on the current configuration
+                Gson gson = gsonBuilder.create();
+
+                objFinalScore = gson.fromJson(result, FinalScoreInfo.class);
+                test_result = result;
+
+                if (objFinalScore != null) {
+                    if (objFinalScore.getScoreStatus() == 1) {
+
+                        // TODO: Verify if it works
+
+                        // Initialize session object
+                        sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
+                        Bundle yourBundle = getIntent().getExtras();
+                        String emailFromIntent = yourBundle.getString("user_email");
+                        sessionTestResult.setTestResult(emailFromIntent, test_result);
+
+
+                        Intent intent = new Intent(PerformTestActivity.this,
+                                ScoreActivity.class);
+                        intent.putExtra("test_result", test_result);
+                        setToastMessage("Displaying Score", Toast.LENGTH_SHORT);
+                        // ParameterStatus.scheduled = false;
+                        // ParameterStatus.dialogScheduled = false;
+                        startActivity(intent);
+                    }
+                } else {
+                    Log.i("PerformTestActivity", "ObjectFinalScore is null: " + result);
+                }
+
+
+            }
+        };
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current game state
+        savedInstanceState.putBoolean("SCH", ParameterStatus.scheduled);
+        savedInstanceState.putBoolean("DSCH", ParameterStatus.dialogScheduled);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    private void startDialog() {
+
+        int currentOrientation = getResources().getConfiguration().orientation;
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+        }
+
+        // TODO: Leaked window when rotated
+
+        if (ParameterStatus.scheduled == false) {
+
+            pd = ProgressDialog.show(PerformTestActivity.this, "title", "loading");
+
+            ParameterStatus.scheduled = true;
+            //start a new thread to process job
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //heavy job here
+
+                    String resp = computeAndSendParameter();
+                    //send message to main thread
+                    Message msg = Message.obtain(); // Creates an new Message instance
+                    msg.obj = resp; // Put the string into Message, into "obj" field.
+                    msg.setTarget(handler); // Set the Handler
+                    msg.sendToTarget();
+
+                }
+            }).start();
         }
     }
 
@@ -259,83 +370,5 @@ public class PerformTestActivity extends Activity {
 
     public void setToastMessage(String message, int type) {
         Toast.makeText(this, message, type).show();
-    }
-
-    private class AsyncTaskCalculateParam extends AsyncTask<String, String, String> {
-
-        private String resp;
-        ProgressDialog progressDialog;
-
-        @Override
-        protected String doInBackground(String... params) {
-            publishProgress("Calculating..."); // Calls onProgressUpdate()
-            try {
-
-                resp = computeAndSendParameter();
-            } catch (Exception e) {
-                e.printStackTrace();
-                resp = e.getMessage();
-            }
-            return resp;
-        }
-
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            // execution of result of Long time consuming operation
-
-                progressDialog.dismiss();
-                btnCheckAdvisory.setEnabled(true);
-                btnCheckScore.setEnabled(true);
-                Log.i("PerformTestActivity", "Response onPostExecute: " + result);
-
-                GsonBuilder gsonBuilder = new GsonBuilder();
-                // Allowing the serialization of static fields
-                gsonBuilder.excludeFieldsWithModifiers(java.lang.reflect.Modifier.TRANSIENT);
-                gsonBuilder.serializeNulls();
-                // Creates a Gson instance based on the current configuration
-                Gson gson = gsonBuilder.create();
-
-                objFinalScore = gson.fromJson(result, FinalScoreInfo.class);
-                test_result = result;
-
-                if (objFinalScore != null) {
-                    if (objFinalScore.getScoreStatus() == 1) {
-
-                        // TODO: Verify if it works
-
-                        // Initialize session object
-                        sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
-                        Bundle yourBundle = getIntent().getExtras();
-                        String emailFromIntent = yourBundle.getString("user_email");
-                        sessionTestResult.setTestResult(emailFromIntent, test_result);
-
-
-                        Intent intent = new Intent(PerformTestActivity.this,
-                                ScoreActivity.class);
-                        intent.putExtra("test_result", test_result);
-                        setToastMessage("Displaying Score", Toast.LENGTH_SHORT);
-                        startActivity(intent);
-                    }
-                } else {
-                    Log.i("PerformTestActivity", "ObjectFinalScore is null: " + result);
-                }
-
-        }
-
-        @Override
-        protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(PerformTestActivity.this,
-                    "ProgressDialog",
-                    "Performing Test");
-        }
-
-        @Override
-        protected void onProgressUpdate(String... text) {
-            //finalResult.setText(text[0]);
-
-        }
-
     }
 }
