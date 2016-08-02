@@ -28,4 +28,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
+    <string name="banner_ad_unit_id">ca-app-pub-9223054310032098/6206810162</string>
+
 </resources>

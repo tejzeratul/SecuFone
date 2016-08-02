@@ -15,8 +15,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -25,6 +23,8 @@ import com.google.gson.GsonBuilder;
 import net.HTTPS_Utility;
 import net.Network_Access;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -39,7 +39,6 @@ import models.ParameterStatus;
 import models.PhoneParameter;
 import models.TestInfo;
 import session.TestResultSessionManager;
-import session.UserSessionManager;
 import setting.AppEnvironment;
 import setting.EnumValues;
 import setting.TempConfigFIle;
@@ -48,15 +47,11 @@ public class PerformTestActivity extends Activity {
 
     private static Context pContext;
 
-    Button btnToBeRemoved;
-    Button btnCheckScore;
-    Button btnCheckAdvisory;
     String test_result;
     Handler handler;
     static ProgressDialog pd;
 
-    TestResultSessionManager sessionTestResult;
-    UserSessionManager sessionUser;
+    TestResultSessionManager sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
 
     PhoneParameter objParamData = null;
     DeviceInfo objDeviceInfo = null;
@@ -75,65 +70,37 @@ public class PerformTestActivity extends Activity {
             ParameterStatus.scheduled = savedInstanceState.getBoolean("SCH");
         }
 
-        // To launch 'Score' activity
-        btnCheckScore = (Button) findViewById(R.id.btnCScore);
+        boolean pastData = sessionTestResult.isTestResultAvailable();
 
-        btnCheckScore.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        if (pastData) {
 
-                Intent intent = new Intent(PerformTestActivity.this,
-                        ScoreActivity.class);
+            String pastDateStr = sessionTestResult.getTestDate(null);
+            if (pastDateStr != null) {
+                DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss zzz yyyy");
+                try {
+                    Date pastDate = df.parse(pastDateStr);
+                    Date currentDate = new Date();
+                    long diff = pastDate.getTime() - currentDate.getTime();
+                    long diffSeconds = (diff / 1000) % 60;
 
-                if (test_result == null) {
-                    Bundle yourBundle = getIntent().getExtras();
-                    test_result = yourBundle.getString("test_result");
+                    if (diffSeconds < 86400) {
 
-                    if (test_result == null) {
-
-                        sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
-                        sessionUser = new UserSessionManager(MainActivity.getContext());
-
-                        test_result = sessionTestResult.getTestResult(sessionUser.getUserEmail());
-
-                    }
-                }
-                intent.putExtra("test_result", test_result);
-                startActivity(intent);
-
-            }
-        });
-
-        // To launch 'Advisory' activity
-        btnCheckAdvisory = (Button) findViewById(R.id.btnCAdvisory);
-
-        btnCheckAdvisory.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                Intent intent = new Intent(PerformTestActivity.this,
-                        AdvisoryActivity.class);
-
-                if (test_result == null) {
-                    Bundle yourBundle = getIntent().getExtras();
-                    test_result = yourBundle.getString("test_result");
-
-                    if (test_result == null) {
-
-                        sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
-                        sessionUser = new UserSessionManager(MainActivity.getContext());
-
-                        test_result = sessionTestResult.getTestResult(sessionUser.getUserEmail());
+                        // TODO: Verify if it works
+                        Log.i("PerformTestActivity", "Using Past Data ");
+                        String pastResult = sessionTestResult.getTestResult(null);
+                        Intent intent = new Intent(PerformTestActivity.this,
+                                ScoreActivity.class);
+                        intent.putExtra("test_result", pastResult);
+                        setToastMessage("Displaying Score", Toast.LENGTH_SHORT);
+                        startActivity(intent);
 
                     }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-                intent.putExtra("test_result", test_result);
-                startActivity(intent);
-
             }
-        });
-
-        btnCheckAdvisory.setEnabled(false);
-        btnCheckScore.setEnabled(false);
+        }
 
         // Check Network Access
         Network_Access objNetworkAccess = new Network_Access();
@@ -141,27 +108,26 @@ public class PerformTestActivity extends Activity {
 
         if (isNetConnected) {
 
-            // To calculate parameters in background using AsyncTask
-
-            // new AsyncTaskCalculateParam().execute("5");
+            // To calculate parameters in background only once
             if (ParameterStatus.dialogScheduled == false) {
                 ParameterStatus.dialogScheduled = true;
+                Log.i("PerformTestActivity", "Start Dialog called");
                 startDialog();
 
             }
 
         } else {
+
             setToastMessage("Network unavailable", Toast.LENGTH_LONG);
         }
 
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
+
                 pd.dismiss();
 
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-                btnCheckAdvisory.setEnabled(true);
-                btnCheckScore.setEnabled(true);
 
                 String result = (String) msg.obj;
                 Log.i("PerformTestActivity", "Response onPostExecute: " + result);
@@ -179,28 +145,30 @@ public class PerformTestActivity extends Activity {
                 if (objFinalScore != null) {
                     if (objFinalScore.getScoreStatus() == 1) {
 
-                        // TODO: Verify if it works
-
                         // Initialize session object
-                        sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
+                        // sessionTestResult = new TestResultSessionManager(MainActivity.getContext());
                         Bundle yourBundle = getIntent().getExtras();
                         String emailFromIntent = yourBundle.getString("user_email");
-                        sessionTestResult.setTestResult(emailFromIntent, test_result);
 
+                        Date today = new Date();
+                        String currentDate = today.toString();
+                        sessionTestResult.setTestResult(emailFromIntent, test_result, currentDate);
 
                         Intent intent = new Intent(PerformTestActivity.this,
                                 ScoreActivity.class);
                         intent.putExtra("test_result", test_result);
                         setToastMessage("Displaying Score", Toast.LENGTH_SHORT);
+
+                        // TODO: Verify below parameters working correctly
+
                         // ParameterStatus.scheduled = false;
                         // ParameterStatus.dialogScheduled = false;
                         startActivity(intent);
                     }
                 } else {
+
                     Log.i("PerformTestActivity", "ObjectFinalScore is null: " + result);
                 }
-
-
             }
         };
     }
@@ -228,7 +196,7 @@ public class PerformTestActivity extends Activity {
 
         if (ParameterStatus.scheduled == false) {
 
-            pd = ProgressDialog.show(PerformTestActivity.this, "title", "loading");
+            pd = ProgressDialog.show(PerformTestActivity.this, "Performing new test", "Computing test data");
 
             ParameterStatus.scheduled = true;
             //start a new thread to process job

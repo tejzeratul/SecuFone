@@ -211,9 +211,8 @@ public class LoginActivity extends AppCompatActivity {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
+
         } else {
-            // TODO: Show progress bar
-            // Show a progress spinner, to perform the login attempt.
 
             // Check Network Access
             Network_Access objNetworkAccess = new Network_Access();
@@ -221,6 +220,7 @@ public class LoginActivity extends AppCompatActivity {
 
             if (isNetConnected) {
 
+                // Show a progress spinner, to perform the login attempt.
                 showProgress(true);
                 mAuthTask = new UserLoginProperty(email, password);
 

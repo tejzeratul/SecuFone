@@ -15,9 +15,9 @@ import setting.AppEnvironment;
 
 public class UserSessionManager {
 
-    private Context userContext;
-    SharedPreferences pref;
-    Editor editor;
+    private static Context userContext;
+    private static SharedPreferences pref;
+   private static Editor editor;
 
     int PRIVATE_MODE = 0;    // Shared pref mode
 

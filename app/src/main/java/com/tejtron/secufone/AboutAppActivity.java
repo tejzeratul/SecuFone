@@ -12,12 +12,16 @@ import android.widget.Toast;
 
 import session.UserSessionManager;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 public class AboutAppActivity extends AppCompatActivity {
 
 
     private static Context aContext;
     EditText etTextAbout;
     UserSessionManager session;
+    AdView adView;
 
 
     @Override
@@ -27,6 +31,11 @@ public class AboutAppActivity extends AppCompatActivity {
 
         aContext = getApplicationContext();
         session = new UserSessionManager(getApplicationContext());
+
+        adView = (AdView) findViewById(R.id.ad_view);
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
 
         etTextAbout = (EditText) findViewById(R.id.editTextAbout);
 
@@ -46,13 +55,25 @@ public class AboutAppActivity extends AppCompatActivity {
 
     }
 
-
-    // extra method added
+    /**
+     * Called when leaving the activity
+     */
+    @Override
+    public void onPause() {
+        if (adView != null) {
+            adView.pause();
+        }
+        super.onPause();
+    }
 
     @Override
     protected void onResume() {
 
         super.onResume();
+
+        if (adView != null) {
+            adView.resume();
+        }
     }
 
     /**

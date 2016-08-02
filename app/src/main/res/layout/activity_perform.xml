@@ -16,28 +16,4 @@
         android:layout_centerHorizontal="true"
         android:visibility="invisible" />
 
-    <Button
-        android:id="@+id/btnCScore"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@id/viewInvisible"
-        android:layout_toStartOf="@id/viewInvisible"
-        android:text="Check Score"
-        android:theme="@style/AppButton" />
-
-    <Button
-        android:id="@+id/btnCAdvisory"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_toEndOf="@+id/viewInvisible"
-        android:layout_toRightOf="@+id/viewInvisible"
-        android:text="Check Advisory"
-        android:theme="@style/AppButton" />
-
 </RelativeLayout>

@@ -17,6 +17,7 @@ public class TestResultSessionManager {
     private static final String PREFER_NAME = "SecuFoneResult";    // Sharedpref file name
     private static final String KEY_TEST_RESULT_AVAILABLE = "IsTestResultAvailable";      // All Shared Preferences Keys
     public static final String KEY_RESULT = "resultMain";                      // User name (make variable public to access from outside)
+    public static final String KEY_DATE = "resultDate";                      // Date on which result generated (make variable public to access from outside)
     public static final String KEY_EMAIL = "email";                    // Email address (make variable public to access from outside)
 
     // Constructor
@@ -29,15 +30,16 @@ public class TestResultSessionManager {
 
     /*
      *
-     *  Create login session for 'App-restart' use after 'Server' verification
+     *  Create test session for 'App-restart' having session data (score & advisory)
      *
      */
-    public void setTestResult(String email, String result) {
+    public void setTestResult(String email, String result, String date) {
 
         // Storing in sharedPreferences
 
         editor.putString(KEY_EMAIL, email);
         editor.putString(KEY_RESULT, result);
+        editor.putString(KEY_DATE, date);
         editor.putBoolean(KEY_TEST_RESULT_AVAILABLE,true);
 
         editor.commit();
@@ -46,6 +48,11 @@ public class TestResultSessionManager {
     public String getTestResult(String email) {
 
         return pref.getString(KEY_RESULT,null);
+    }
+
+    public String getTestDate(String email) {
+
+        return pref.getString(KEY_DATE,null);
     }
 
 

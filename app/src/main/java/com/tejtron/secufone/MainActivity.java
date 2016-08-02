@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this,
                         PerformTestActivity.class);
                 intent.putExtra("user_email", userEmail);
+                intent.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                 startActivity(intent);
 
             }
@@ -121,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
 
                 } else {
+
+                    Log.i("MainActivity", "Using Past Data ");
                     String result = testResultSession.getTestResult(userEmail);
                     Intent intent = new Intent(MainActivity.this,
                             ScoreActivity.class);
