@@ -85,7 +85,6 @@ public class PerformTestActivity extends Activity {
 
                     if (diffSeconds < 86400) {
 
-                        // TODO: Verify if it works
                         Log.i("PerformTestActivity", "Using Past Data ");
                         String pastResult = sessionTestResult.getTestResult(null);
                         Intent intent = new Intent(PerformTestActivity.this,

@@ -263,7 +263,7 @@ public class LoginActivity extends AppCompatActivity {
                     AppEnvironment.setAndroidId(dev_AndroidId);
 
                 /*
-                 * TODO: Hard coded name
+                 * TODO: Hard coded name, get Name from server
                  * In future, get it from server, using json response
                  */
                     sessionLogin.createUserLoginSession("Tejas", UserLoginProperty.mEmail, dev_AndroidId);

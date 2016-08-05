@@ -58,7 +58,7 @@ public class AdvisoryActivity extends AppCompatActivity {
 
         StringBuilder sb = new StringBuilder();
 
-        // TODO: Null check
+
         if (objFinalScore != null) {
 
             ArrayList<AdvisoryInfo> objAdvisoryInfoList = objFinalScore.getObjAdvisoryInfoList();
