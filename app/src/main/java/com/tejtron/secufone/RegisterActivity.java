@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -37,6 +38,13 @@ import setting.TempConfigFIle;
 import validate.UserValidation;
 import validate.Validation;
 
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceTypes;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+
 /**
  * A register screen that offers user registration.
  */
@@ -65,6 +73,9 @@ public class RegisterActivity extends AppCompatActivity {
     private View mRegisterFormView;
     private Button mEmailSignUpButton;
 
+    private static final String LOG_TAG = "PlaceSelectionListener";
+    private TextView locationTextView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -77,6 +88,40 @@ public class RegisterActivity extends AppCompatActivity {
         mPassword1View = (EditText) findViewById(R.id.password1);
         mPassword2View = (EditText) findViewById(R.id.password2);
         mEmailSignUpButton = (Button) findViewById(R.id.email_register_button);
+        // locationTextView=(TextView) findViewById(R.id.autocompleteText);
+
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+
+        autocompleteFragment.setHint("Search Location");
+
+        // TODO: Change line appearance
+        autocompleteFragment.getView().setBackgroundResource(R.drawable.lineshape);
+
+
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                .build();
+        autocompleteFragment.setFilter(typeFilter);
+
+
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                Log.i(LOG_TAG, "Place: " + place.getAddress());
+
+
+                // locationTextView.setText(place.getName());
+                setToastMessage(place.getName().toString(), Toast.LENGTH_SHORT);
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                Log.i(LOG_TAG, "An error occurred: " + status);
+            }
+        });
+
 
         // Listening to register new account link
         tvLoginText.setOnClickListener(new View.OnClickListener() {

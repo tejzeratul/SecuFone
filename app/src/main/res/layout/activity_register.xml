@@ -63,6 +63,27 @@
 
             </android.support.design.widget.TextInputLayout>
 
+
+
+            <fragment
+                android:id="@+id/place_autocomplete_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+
+                />
+
+
+      <!--      <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:id="@+id/autocompleteText" />  -->
+
+
+
+
+
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
