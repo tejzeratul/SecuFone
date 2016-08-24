@@ -2,13 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFAFA"
     android:gravity="center_horizontal"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="#FFFAFA"
     tools:context="com.tejtron.secufone.RegisterActivity">
 
     <!-- Register progress -->
@@ -22,9 +22,9 @@
 
     <ScrollView
         android:id="@+id/register_form"
-        android:padding="2dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="2dp">
 
         <LinearLayout
             android:id="@+id/email_register_form"
@@ -48,6 +48,7 @@
 
             </android.support.design.widget.TextInputLayout>
 
+
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -62,27 +63,27 @@
                     android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>
-
-
-
-            <fragment
-                android:id="@+id/place_autocomplete_fragment"
+<!--
+            <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+                android:layout_height="wrap_content">
+-->
 
-                />
+                <fragment
+                    android:id="@+id/place_autocomplete_fragment"
+                    android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_weight="1"
+                    android:windowIsFloating="false"
+                    android:inputType="text"
+                    />
 
-
-      <!--      <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:id="@+id/autocompleteText" />  -->
-
-
-
-
+<!--
+            </android.support.v7.widget.CardView>
+-->
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -93,9 +94,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password1"
-
                     android:inputType="textPassword"
+
                     android:maxLines="1"
+                    android:paddingTop="2dp"
                     android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>

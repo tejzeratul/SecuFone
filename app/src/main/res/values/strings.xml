@@ -5,6 +5,7 @@
 
     <!-- Strings related to login -->
     <string name="prompt_name">Name</string>
+    <string name="prompt_location">Location</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password1">Password</string>
     <string name="prompt_password2">Confirm password</string>

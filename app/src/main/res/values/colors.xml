@@ -15,5 +15,6 @@
     <color name="colorAppSecondaryText">#727272</color>
     <color name="colorAppDivider">#B6B6B6</color>
     <color name="white">#FFFFFF</color>
+    <color name="colorActivityBg">#FFFAFA</color>
 </resources>
 

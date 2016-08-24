@@ -5,9 +5,12 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Path;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -88,16 +91,15 @@ public class RegisterActivity extends AppCompatActivity {
         mPassword1View = (EditText) findViewById(R.id.password1);
         mPassword2View = (EditText) findViewById(R.id.password2);
         mEmailSignUpButton = (Button) findViewById(R.id.email_register_button);
-        // locationTextView=(TextView) findViewById(R.id.autocompleteText);
+        //   locationTextView=(TextView) findViewById(R.id.place);
 
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
-        autocompleteFragment.setHint("Search Location");
-
-        // TODO: Change line appearance
-        autocompleteFragment.getView().setBackgroundResource(R.drawable.lineshape);
-
+        autocompleteFragment.setHint("Search location");
+        autocompleteFragment.getView().setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorActivityBg));
+        autocompleteFragment.getView().setPadding(0,0,0,2);
+        autocompleteFragment.getView().canScrollHorizontally(1);
 
         AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
                 .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
@@ -106,7 +108,6 @@ public class RegisterActivity extends AppCompatActivity {
 
 
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
             public void onPlaceSelected(Place place) {
                 Log.i(LOG_TAG, "Place: " + place.getAddress());
 
